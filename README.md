@@ -1,1 +1,1 @@
-![](https://i.ibb.co/jLvK9bw/ocial-white.png)
+![](https://raw.githubusercontent.com/onurasiliskender/ocial/master/images/ocial_white.png)
