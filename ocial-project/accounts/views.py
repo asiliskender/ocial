@@ -8,8 +8,10 @@ def signup(request):
 			try:
 				user = User.objects.get(username = request.POST['username'])
 				return render(request, 'accounts/signup.html', {'error': 'Username has already been taken'})
+
+				#TODO email must be checked.
 			except User.DoesNotExist:
-				user = User.objects.create_user(request.POST['username'], password = request.POST['password'])
+				user = User.objects.create_user(request.POST['username'], password = request.POST['password'], email = request.POST['email'],first_name = request.POST['firstname'],last_name = request.POST['lastname'])
 				auth.login(request,user)
 				return redirect('home') 
 		else:
@@ -20,8 +22,19 @@ def signup(request):
 
 
 def login(request):
-	return render(request, 'accounts/login.html')
+	if request.method == 'POST':
+		user = auth.authenticate(username = request.POST['username'],password = request.POST['password'])
+		if user is not None:
+			auth.login(request,user)
+			return redirect('home') 
+		else:
+			return render(request, 'accounts/login.html', {'error': 'Username or password is incorrect.'})
+
+
+	else:
+		return render(request, 'accounts/login.html')
 
 def logout(request):
-	#TODO need to route to home page
-	return render(request, 'accounts/login.html')
+	if request.method == 'POST':
+		auth.logout(request)
+		return redirect('home')
