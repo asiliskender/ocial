@@ -20,7 +20,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'rl#(4*zs(sh1z3d9qd-b=lx#(&mjbxmf_f1va%nbqa7b#d#(j7'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -76,17 +75,7 @@ WSGI_APPLICATION = 'ocial.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'ocialdb',
-        'USER': 'postgres',
-        'PASSWORD': 'tosun1234',
-        'HOST':'localhost',
-        'PORT':'5432'
 
-    }
-}
 
 
 # Password validation
