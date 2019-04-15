@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+
+
+
+
+
+
+{% block content %}
+
+{% include "topics/classroom_sidebar.html" %}
+
+
+<div class="wrapper" style="text-align: left;">
+
+	<button onclick="window.location.href = '{% url 'teacher' %}';" class="btn btn-danger">Teacher</button>
+
+</div>
+
+
+
+
+
+{%endblock%}
+
