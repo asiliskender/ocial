@@ -10,7 +10,7 @@ urlpatterns = [
 	path('accounts/', include('accounts.urls')),
     path('classroom/', include('topics.urls')),
     path('topics',views.topics, name= 'topics'),
-    path('explore',views.courses, name= 'courses'),
+    path('explore',views.explore, name= 'explore'),
 
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

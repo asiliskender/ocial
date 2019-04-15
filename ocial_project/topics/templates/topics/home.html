@@ -8,28 +8,8 @@
 
 <img style="width:100%;" id="home_image" src="{% static 'home_image.png' %}">
 
-<div class="container">
-<div class="album py-5 bg-light">
-    <div class="container">
+{% include "../temp/topics_list.html" %}
 
-      <div class="row">       
-        {% for topic in topics %}
-
-        <div class="col-md-4">
-          <div class="card mb-4 shadow-sm">
-            <div class="card-body">
-              <p class="card-text">{{ topic.title }}</p>
-              <div class="d-flex justify-content-between align-items-center">
-                <small class="text-muted">{{topic.number_of_answers}}  courses</small>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {% endfor %}
-
-      </div>
-    </div>
 
     <div class="wrapper" style="text-align: center;">
 

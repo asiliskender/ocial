@@ -26,7 +26,7 @@ def topics(request):
 		return render(request, 'topics/topics.html', {'topics': topics})
 
 
-def courses(request):
+def explore(request):
 	if request.method == 'GET': # If the form is submitted
 		search_query = request.GET.get('search_course', None)
 
@@ -36,7 +36,7 @@ def courses(request):
 			courses = Course.objects.all()
 			#courses = sorted(courses,reverse=True)
 		
-		return render(request, 'topics/courses.html', {'courses': courses})
+		return render(request, 'topics/explore.html', {'courses': courses})
 
 
 @login_required
