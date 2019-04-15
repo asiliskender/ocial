@@ -29,9 +29,12 @@ def topics(request):
 def explore(request):
 	if request.method == 'GET': # If the form is submitted
 		search_query = request.GET.get('search_course', None)
+		search_query_topic = request.GET.get('search_topic', None)
 
 		if search_query != None:
 			courses = Course.objects.filter(title__icontains=search_query)
+		elif search_query_topic != None:
+			courses = Course.objects.filter(topic=search_query_topic)
 		else:
 			courses = Course.objects.all()
 			#courses = sorted(courses,reverse=True)
