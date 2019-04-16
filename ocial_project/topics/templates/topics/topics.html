@@ -4,11 +4,6 @@
 
 {% load staticfiles %}
 
-	{% if error %}
-
-	<p style="color:red;" class="text-center"> {{error}} </p>
-
-	{%endif%}
 
 
 <form id="searchform" action="{% url 'topics' %}" method="get" accept-charset="utf-8">
@@ -17,8 +12,8 @@
 	</div>
 </form>
 
-{% include "../temp/topics_list.html" %}
 
+{% include "../temp/topics_list.html" %}
 
 
 
