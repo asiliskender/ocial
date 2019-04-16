@@ -13,7 +13,7 @@ class Topic(models.Model):
 class Course(models.Model):
 	title = models.CharField(max_length=200)
 	pubdate = models. DateTimeField()
-	image = models.ImageField(upload_to='images/', default= '/static/default.jpg')
+	image = models.ImageField(upload_to='images/', default= '../static/default.jpg')
 	description = models.TextField(blank=True)
 	wywl = models.TextField(blank=True)
 	teacher = models.ForeignKey(User, on_delete=models.CASCADE)
