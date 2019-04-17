@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from .models import *
@@ -25,7 +25,6 @@ def topics(request):
 		
 		return render(request, 'topics/topics.html', {'topics': topics})
 
-
 def explore(request):
 	if request.method == 'GET': # If the form is submitted
 		search_query = request.GET.get('search_course', None)
@@ -40,6 +39,13 @@ def explore(request):
 			#courses = sorted(courses,reverse=True)
 		
 		return render(request, 'topics/explore.html', {'courses': courses})
+
+def coursedetail(request, course_id):
+	coursedetail =  get_object_or_404(Course,pk=course_id)
+
+	#labels = Course.objects.get(label=course_id)
+	return render(request, 'topics/course_detail.html', {'coursedetail': coursedetail})
+
 
 
 @login_required

@@ -23,13 +23,13 @@ class Course(models.Model):
 
 
 	def pub_date(self):
-		return self.pubdate.strftime('%b %e %Y')
+		return self.pubdate.strftime('%e %B %Y')
 
 	def __str__(self):
 		return self.title
 
 	def summary(self):
-		return self.description[:150]
+		return self.description[:200]
 
 class Label(models.Model):
 	name = models.CharField(max_length=50, unique=True)

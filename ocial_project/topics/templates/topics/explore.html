@@ -20,12 +20,34 @@
 	</div>
 </form>
 
-{% include "../temp/course_list.html" %}
+<div class="container" style="margin-top:20px;">
+
+  <div class="card-deck">
+
+  {% for course in courses %}
 
 
+    <div class="card">
+      <img class="card-img-top" src="{{ course.image.url }}" alt="Card image cap">
+      <div class="card-body">
+        <a href="{% url 'coursedetail' course.id %}"><h5 class="card-title">{{ course.title }}</h5></a>
+        <p class="card-text">{{ course.summary }}</p>
+      </div>
 
+      <div class="card-footer">
+        <small class="text-muted"><a href="#">{{ course.topic }}</a></small> <br />
+        <small class="text-muted">{{ course.pub_date }}</small>
+      </div>
+    </div>
+    {% endfor %}
+
+  </div>
 
 </div>
+
+
+
+
 
 {%endblock%}
 

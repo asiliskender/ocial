@@ -11,6 +11,8 @@ urlpatterns = [
     path('classroom/', include('topics.urls')),
     path('topics',views.topics, name= 'topics'),
     path('explore',views.explore, name= 'explore'),
+    path('course/<int:course_id>/', views.coursedetail, name = 'coursedetail'),
+
 
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
