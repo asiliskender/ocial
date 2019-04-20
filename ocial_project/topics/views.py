@@ -65,8 +65,7 @@ def newcourse(request):
 			if request.POST['title'] and request.POST.getlist('topic'):
 				course = Course()
 				savecourse(request,course)
-				return redirect('teacher')
-				#return render(request, 'topics/newcourse.html', {'topics': topics , 'error': labels})	
+				return redirect('editcourse', course_id=course.id)
 			else:
 				return render(request, 'topics/newcourse.html', {'topics': topics , 'error': 'Title and Topic fields are required'})	
 	else:
@@ -74,24 +73,50 @@ def newcourse(request):
 
 @login_required
 def editcourse(request,course_id):
-	coursedetail =  get_object_or_404(Course,pk=course_id)
+	course =  get_object_or_404(Course,pk=course_id)
 	topics = Topic.objects.all()
 
+	print(course.id)
+
 	if request.method == 'POST':
+		if 'newtopic' in request.POST:
+			newtopic(request, course)
+			return redirect('editcourse', course_id=course.id)
+
+
+
 		if 'save' in request.POST:
 			if request.POST['title'] and request.POST.getlist('topic'):
-				course = Course()
-				savecourse(request)
-				return redirect('teacher')
-				#return render(request, 'topics/newcourse.html', {'topics': topics , 'error': labels})	
+				savecourse(request,course)
+				return redirect('editcourse', course_id=course.id)
 			else:
-				return render(request, 'topics/newcourse.html', {'topics': topics , 'error': 'Title and Topic fields are required'})	
+				return render(request, 'topics/editcourse.html', {'topics': topics , 'course': course, 'error': 'Title and Topic fields are required'})
+		elif 'publish' in request.POST:
+			if request.POST['title'] and request.POST.getlist('topic'):
+				savecourse(request,course)
+				course.published = True
+				course.save()
+				return redirect('teacher')
+			else:
+				return render(request, 'topics/editcourse.html', {'topics': topics , 'course': course, 'error': 'Title and Topic fields are required'})
+
+
 	else:
-		return render(request, 'topics/editcourse.html',{'topics': topics ,'coursedetail': coursedetail},)
+		return render(request, 'topics/editcourse.html',{'topics': topics ,'course': course},)
+
+
+
+def newtopic(request, course):
+	topic , created = Topic.objects.get_or_create(title=request.POST['topictitle'])
+	topic.save()
+	savecourse(request,course)
+	course.topic  = topic
+	course.save()
 
 
 
 def savecourse(request,course):
+
 	course.title = request.POST['title']
 	course.description = request.POST['description']
 	course.wywl = request.POST['wywl']
@@ -109,6 +134,7 @@ def savecourse(request,course):
 	labels = labels.split(",")
 
 	course.save()
+
 
 	if request.POST['labels']:
 		for label in labels:

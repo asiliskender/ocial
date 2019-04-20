@@ -22,6 +22,8 @@ class Course(models.Model):
 	published = models.BooleanField(default=False)
 
 
+	def pub_date_exact(self):
+		return self.pubdate.strftime('%e %B %Y %H:%M')
 
 
 	def pub_date(self):

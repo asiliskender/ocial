@@ -27,7 +27,7 @@
         
 
             <div class="row">
-                <div class="col-sm-9">  
+                <div class="col-sm-8">  
                     <input type="text" class="form-control" name="title" placeholder="Title">
                     <br />
 
@@ -43,7 +43,7 @@
                           });
                         </script>       
                 </div>
-                <div class="col-sm-3">
+                <div class="col-sm-4">
                     <label for="image">Course Image</label>
                     <input type="file" class="form-control-file" name="image">
                     <br />
@@ -55,6 +55,7 @@
                             <option value="{{ topic.id }}">{{ topic }}</option>
                         {% endfor %}
                     </select>
+
                     <br />
 
                     <input type="text" class="form-control" name="labels" placeholder="Labels">
