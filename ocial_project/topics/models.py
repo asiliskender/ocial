@@ -19,6 +19,8 @@ class Course(models.Model):
 	teacher = models.ForeignKey(User, on_delete=models.CASCADE)
 	topic = models.ForeignKey('Topic', on_delete=models.CASCADE)
 	label = models.ManyToManyField('Label', blank=True)
+	published = models.BooleanField(default=False)
+
 
 
 

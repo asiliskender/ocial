@@ -31,19 +31,17 @@ def explore(request):
 		search_query_topic = request.GET.get('search_topic', None)
 
 		if search_query != None:
-			courses = Course.objects.filter(title__icontains=search_query)
+			courses = Course.objects.filter(title__icontains=search_query, published=True)
 		elif search_query_topic != None:
-			courses = Course.objects.filter(topic=search_query_topic)
+			courses = Course.objects.filter(topic=search_query_topic,published=True)
 		else:
-			courses = Course.objects.all()
+			courses = Course.objects.filter(published=True)
 			#courses = sorted(courses,reverse=True)
 		
 		return render(request, 'topics/explore.html', {'courses': courses})
 
 def coursedetail(request, course_id):
 	coursedetail =  get_object_or_404(Course,pk=course_id)
-
-	#labels = Course.objects.get(label=course_id)
 	return render(request, 'topics/course_detail.html', {'coursedetail': coursedetail})
 
 
@@ -63,41 +61,59 @@ def teacher(request):
 def newcourse(request):
 	topics = Topic.objects.all()
 	if request.method == 'POST':
-		if request.POST['title'] and request.POST.getlist('topic'):
-			course = Course()
-			course.title = request.POST['title']
-			course.description = request.POST['description']
-			course.wywl = request.POST['wywl']
-			course.pubdate = timezone.datetime.now()
-			course.teacher = request.user
-
-			topic_title = request.POST.get('topic')
-			course.topic  = Topic.objects.get(id=topic_title)
-		
-
-			if request.FILES.get('image', False):
-				course.image = request.FILES['image']
-
-			labels = request.POST['labels']
-			labels = labels.split(",")
-
-			course.save()
-
-			if request.POST['labels']:
-				for label in labels:
-					newlabel , created = Label.objects.get_or_create(name = label)
-					course.label.add(newlabel)
-
-			return redirect('teacher')
-			#return render(request, 'topics/newcourse.html', {'topics': topics , 'error': labels})	
-
-		else:
-			return render(request, 'topics/newcourse.html', {'topics': topics , 'error': 'Title and Topic fields are required'})	
+		if 'save' in request.POST:
+			if request.POST['title'] and request.POST.getlist('topic'):
+				course = Course()
+				savecourse(request,course)
+				return redirect('teacher')
+				#return render(request, 'topics/newcourse.html', {'topics': topics , 'error': labels})	
+			else:
+				return render(request, 'topics/newcourse.html', {'topics': topics , 'error': 'Title and Topic fields are required'})	
 	else:
 		return render(request, 'topics/newcourse.html',{'topics': topics})
 
+@login_required
+def editcourse(request,course_id):
+	coursedetail =  get_object_or_404(Course,pk=course_id)
+	topics = Topic.objects.all()
+
+	if request.method == 'POST':
+		if 'save' in request.POST:
+			if request.POST['title'] and request.POST.getlist('topic'):
+				course = Course()
+				savecourse(request)
+				return redirect('teacher')
+				#return render(request, 'topics/newcourse.html', {'topics': topics , 'error': labels})	
+			else:
+				return render(request, 'topics/newcourse.html', {'topics': topics , 'error': 'Title and Topic fields are required'})	
+	else:
+		return render(request, 'topics/editcourse.html',{'topics': topics ,'coursedetail': coursedetail},)
 
 
+
+def savecourse(request,course):
+	course.title = request.POST['title']
+	course.description = request.POST['description']
+	course.wywl = request.POST['wywl']
+	course.pubdate = timezone.datetime.now()
+	course.teacher = request.user
+
+	topic_title = request.POST.get('topic')
+	course.topic  = Topic.objects.get(id=topic_title)
+			
+
+	if request.FILES.get('image', False):
+		course.image = request.FILES['image']
+
+	labels = request.POST['labels']
+	labels = labels.split(",")
+
+	course.save()
+
+	if request.POST['labels']:
+		for label in labels:
+			newlabel , created = Label.objects.get_or_create(name = label)
+			course.label.add(newlabel)
 
 
 

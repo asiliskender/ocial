@@ -15,7 +15,7 @@
   		<small>{{ coursedetail.pub_date }}</small>
   		<h1 class="card-title">{{ coursedetail.title }}</h1>
     	<p>{{ coursedetail.description }}</p>
-    	<p>{{ coursedetail.wywl }}</p>
+    	{{ coursedetail.wywl | safe }}
   </div>
   <div class="col">	
 	  <div class="card" style="width: 450px; position: fixed;">
