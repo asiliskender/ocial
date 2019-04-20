@@ -61,6 +61,10 @@ def teacher(request):
 def newcourse(request):
 	topics = Topic.objects.all()
 	if request.method == 'POST':
+		if 'newtopic' in request.POST:
+			topic , created = Topic.objects.get_or_create(title=request.POST['topictitle'])
+			topic.save()
+			return redirect('newcourse')
 		if 'save' in request.POST:
 			if request.POST['title'] and request.POST.getlist('topic'):
 				course = Course()
@@ -79,11 +83,18 @@ def editcourse(request,course_id):
 	print(course.id)
 
 	if request.method == 'POST':
-		if 'newtopic' in request.POST:
-			newtopic(request, course)
+		if 'removelabel' in request.POST:
+			label = request.POST['labelremove']
+			course.label.remove(label)
 			return redirect('editcourse', course_id=course.id)
 
-
+		if 'newtopic' in request.POST:
+			topic , created = Topic.objects.get_or_create(title=request.POST['topictitle'])
+			topic.save()
+			savecourse(request,course)
+			course.topic  = topic
+			course.save()
+			return redirect('editcourse', course_id=course.id)
 
 		if 'save' in request.POST:
 			if request.POST['title'] and request.POST.getlist('topic'):
@@ -91,7 +102,8 @@ def editcourse(request,course_id):
 				return redirect('editcourse', course_id=course.id)
 			else:
 				return render(request, 'topics/editcourse.html', {'topics': topics , 'course': course, 'error': 'Title and Topic fields are required'})
-		elif 'publish' in request.POST:
+		
+		if 'publish' in request.POST:
 			if request.POST['title'] and request.POST.getlist('topic'):
 				savecourse(request,course)
 				course.published = True
@@ -100,20 +112,8 @@ def editcourse(request,course_id):
 			else:
 				return render(request, 'topics/editcourse.html', {'topics': topics , 'course': course, 'error': 'Title and Topic fields are required'})
 
-
 	else:
 		return render(request, 'topics/editcourse.html',{'topics': topics ,'course': course},)
-
-
-
-def newtopic(request, course):
-	topic , created = Topic.objects.get_or_create(title=request.POST['topictitle'])
-	topic.save()
-	savecourse(request,course)
-	course.topic  = topic
-	course.save()
-
-
 
 def savecourse(request,course):
 
@@ -140,9 +140,5 @@ def savecourse(request,course):
 		for label in labels:
 			newlabel , created = Label.objects.get_or_create(name = label)
 			course.label.add(newlabel)
-
-
-
-
 
 

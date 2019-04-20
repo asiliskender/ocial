@@ -21,7 +21,7 @@
 	  <div class="card" style="width: 450px; position: fixed;">
 			  <img class="card-img-top" src="{{ coursedetail.image.url }}" alt="Card image cap">
 			  <ul class="list-group list-group-flush">
-			  	<a href="#" class="btn btn-danger">Enroll</a>
+			  	<a href="#" class="btn btn-danger btn-block">Enroll</a>
 			    <li class="list-group-item">
 			    	<a href="#">{{ coursedetail.topic.title }}</a>
 			    </li>
@@ -29,7 +29,7 @@
 			  </ul>
 			  <div class="card-body">
 			    	{% for label in coursedetail.label.all %} 
-				    		<a href="#">#{{ label.name }}</a>
+            <a href="#" class="badge badge-pill badge-danger" style="margin-bottom: 5px;">{{ label.name }}</a>
 				    {% endfor %}
 			  </div>
 

@@ -8,6 +8,8 @@
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.11/summernote-lite.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.11/summernote-lite.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
 
 <div class="container-fluid" style="margin-top:40px;">
 
@@ -62,15 +64,26 @@
                         </select>
                         <br />
 
-                        <form class="form-inline" class="form-control" action="{% url 'editcourse' course.id %}">
-                            <input type="text" class="form-control" name="topictitle" placeholder="New Topic">
-                            <button type="submit" name="newtopic" class="btn btn-danger">New Topic</button>
+                        <form class="form-inline" action="{% url 'editcourse' course.id %}">
+                            <div class="input-group mb-3">
+                              <input type="text" class="form-control" placeholder="New Topic" name="topictitle" aria-describedby="basic-addon2">
+                              <div class="input-group-append">
+                                <button class="btn btn-outline-danger" type="submit" name="newtopic" >Add</button>
+                              </div>
+                            </div>
                         </form>
 
                    
                         <br />
 
-                        <input type="text" class="form-control" name="labels" placeholder="Labels" value="{% for label in course.label.all %}{{ label.name }}, {% endfor %}">
+
+
+                        {% for label in course.label.all %} 
+                        <button type="submit" name="removelabel" class="badge badge-pill badge-dark" style="margin-bottom: 5px;">{{ label.name }}</button>
+                            <input type="hidden" name="labelremove"  value="{{ label.id }}">
+                        {% endfor %}
+
+                        <input type="text" class="form-control" name="labels" placeholder="Labels">
 
                         <br />
 
