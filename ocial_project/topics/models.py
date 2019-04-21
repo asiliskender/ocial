@@ -44,7 +44,10 @@ class Label(models.Model):
 class Section(models.Model):
 	name = models.CharField(max_length=200)
 	course = models.ForeignKey('Course', on_delete=models.CASCADE)
+	order =  models.IntegerField(default=1)
 
+	class Meta:
+		ordering = ['order']
 
 	def __str__(self):
 		return self.name

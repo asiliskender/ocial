@@ -1,0 +1,27 @@
+{% extends '../temp/classroom_base.html' %}
+
+{% load static %}   
+
+
+{% block content %}
+
+
+<div class="container-fluid" style="margin-top:40px;">
+
+	{% if error %}
+
+	<p style="color:red;" class="text-center"> {{error}} </p>
+
+	{%endif%}
+
+    <form method="POST" action="{% url 'editsection' section.id %}" enctype="multipart/form-data">
+        {% csrf_token %}
+
+    {% include "temp/section_new_edit.html" %}
+
+
+    </form>
+
+</div>
+
+{%endblock%}

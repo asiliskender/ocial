@@ -1,0 +1,19 @@
+ <div class="form-group">
+    
+            <div class="row">
+                <div class="col-sm-8">  
+                    <small>{{course.title}}</small>
+                    {% if section.id %}<small>{{section.course}}</small>{% endif %}
+                    <input type="text" class="form-control" name="sectionname" placeholder="Section Name" value="{{ section.name }}">
+                </div>
+
+
+
+                <div class="col-sm-4">
+                        <button type="button" name="addresource" class="btn btn-danger btn-block">Add Resource</button>
+
+                        <button type="submit" name="save" class="btn btn-danger btn-block">Save</button>
+                        {% if section.id %}<button type="submit" name="submit_section" class="btn btn-danger btn-block">Submit</button>{% endif %}
+                </div>
+            </div>
+        </div>

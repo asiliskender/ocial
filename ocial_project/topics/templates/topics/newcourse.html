@@ -20,64 +20,8 @@
     <form method="POST" action="{% url 'newcourse' %}" enctype="multipart/form-data">
     	{% csrf_token %}
 
+    {% include "temp/course_new_edit.html" %}
 
-
-        <div class="form-group">
-        
-        
-
-            <div class="row">
-                <div class="col-sm-8">  
-                    <input type="text" class="form-control" name="title" placeholder="Title">
-                    <br />
-
-                    <textarea type="text" class="form-control" name="description" rows="4" placeholder="Course Description"></textarea>
-                    <br />
-
-                     <textarea id="summernote" name="wywl"></textarea>
-                        <script>
-                          $('#summernote').summernote({
-                            placeholder: 'What they will learn?',
-                            tabsize: 1,
-                            height: 250
-                          });
-                        </script>       
-                </div>
-                <div class="col-sm-4">
-                    <label for="image">Course Image</label>
-                    <input type="file" class="form-control-file" name="image">
-                    <br />
-
-                    <label for="exampleFormControlSelect1">Topic</label>
-                    <select class="form-control" name="topic" placeholder="Course Description" >
-                        <option disabled selected>Select topic</option>
-                        {% for topic in topics.all %}
-                            <option value="{{ topic.id }}">{{ topic }}</option>
-                        {% endfor %}
-                    </select>
-
-                    <br />
-
-
-                    <form class="form-inline" class="form-control" action="{% url 'newcourse' %}">
-                            <div class="input-group mb-3">
-                              <input type="text" class="form-control" placeholder="New Topic" name="topictitle" aria-describedby="basic-addon2">
-                              <div class="input-group-append">
-                                <button class="btn btn-outline-danger" type="submit" name="newtopic" >Add</button>
-                              </div>
-                            </div>
-                   </form>
-
-
-                    <br />
-
-                    <input type="text" class="form-control" name="labels" placeholder="Labels">
-                    <br />
-
-                     <button type="submit" name="save" class="btn btn-danger">Save</button>
-                </div>
-            </div>
-        </div>
 
 
     </form>
