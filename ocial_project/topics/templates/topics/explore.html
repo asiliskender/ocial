@@ -22,30 +22,33 @@
 
 <div class="container" style="margin-top:20px;">
 
-  <div class="card-deck">
+  <div class="album py-5 bg-light">
+    <div class="container">
 
-  {% for course in courses %}
+      <div class="row">
+        
+        {% for course in courses %}
 
+        <div class="col-md-4">
+          <div class="card mb-4 shadow-sm">
+            <img class = "card-img-top" src="{{ course.image.url }}" />
+            <div class="card-body">
+              <a href="{% url 'coursedetail' course.id %}"><h6 class="card-text">{{ course.title }}</h6></a>
+              <p class="card-text">{{ course.summary }}</p>
+            </div>
 
-    <div class="card">
-      <img class="card-img-top" src="{{ course.image.url }}" alt="Card image cap">
-      <div class="card-body">
-        <a href="{% url 'coursedetail' course.id %}"><h5 class="card-title">{{ course.title }}</h5></a>
-        <p class="card-text">{{ course.summary }}</p>
-      </div>
+            <div class="card-footer">
+                <small class="text-muted"><a href="#">{{ course.topic }}</a></small> <br />
+                <small class="text-muted">{{ course.pub_date }}</small>
+            </div>
+          </div>
+        </div>
 
-      <div class="card-footer">
-        <small class="text-muted"><a href="#">{{ course.topic }}</a></small> <br />
-        <small class="text-muted">{{ course.pub_date }}</small>
+        {% endfor %}
+
       </div>
     </div>
-    {% endfor %}
-
   </div>
-
-</div>
-
-
 
 
 

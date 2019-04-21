@@ -18,10 +18,10 @@ def topics(request):
 		search_query = request.GET.get('search_topic', None)
 
 		if search_query != None:
-			topics = Topic.objects.filter(title__icontains=search_query).annotate(number_of_answers=Count('course')) 
+			topics = Topic.objects.filter(title__icontains=search_query).annotate(number_of_courses=Count('course')) 
 		else:
-			topics = Topic.objects.annotate(number_of_answers=Count('course')) 
-			topics = sorted(topics, key=operator.attrgetter('number_of_answers'),reverse=True)
+			topics = Topic.objects.annotate(number_of_courses=Count('course')) 
+			topics = sorted(topics, key=operator.attrgetter('number_of_courses'),reverse=True)
 		
 		return render(request, 'topics/topics.html', {'topics': topics})
 
