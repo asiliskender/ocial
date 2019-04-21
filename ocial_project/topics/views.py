@@ -41,8 +41,8 @@ def explore(request):
 		return render(request, 'topics/explore.html', {'courses': courses})
 
 def coursedetail(request, course_id):
-	coursedetail =  get_object_or_404(Course,pk=course_id)
-	return render(request, 'topics/course_detail.html', {'coursedetail': coursedetail})
+	course =  get_object_or_404(Course,pk=course_id)
+	return render(request, 'topics/course_detail.html', {'course': course})
 
 
 
