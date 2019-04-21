@@ -61,3 +61,12 @@ class Glossary(models.Model):
 
 	def __str__(self):
 		return self.name
+
+class Resource(models.Model):
+	name = models.CharField(max_length=200, blank=True)
+	link = models.FileField(upload_to='sources/', blank=True)
+	section = models.ForeignKey('Section', on_delete=models.CASCADE)
+
+
+	def __str__(self):
+		return self.name

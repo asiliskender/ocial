@@ -5,7 +5,7 @@
                     <input type="text" class="form-control" name="title" placeholder="Title" value="{{ course.title }}">
                     {% if course.id %}
                     <ul class="list-group mt-4" id="demo2">
-                        <button type="button" onclick="window.location.href = '{% url 'newsection' course.id %}';" class="btn btn-danger">New Section </button>
+                        <button type="submit" name="newsection" class="btn btn-danger">New Section</button>
 
 
                         {% for section in course.section_set.all %} 
@@ -14,11 +14,6 @@
 
                     </ul>  
                     {% endif %}
-
-
-
-
-
 
                     <br />
 
@@ -41,7 +36,13 @@
 
 
                 <div class="col-sm-4">
-                        {% if course.image %}<img src="{{ course.image.url }}" style="width:100%; height: auto">{% endif %}
+                        {% if course.image %}
+                        <button type="submit" name="addglossary" class="btn btn-danger btn-block">Add Glossary</button>
+                        <br />
+
+                        <img src="{{ course.image.url }}" style="width:100%; height: auto">
+
+                        {% endif %}
                         <input type="file" class="form-control-file" name="image" >
                         <br />
                         <label for="exampleFormControlSelect1">Topic</label>

@@ -4,6 +4,9 @@ from django.utils import timezone
 from .models import *
 from django.db.models import Count
 import operator
+import requests
+import json
+from wikidata.client import Client
 
 
 
@@ -33,7 +36,7 @@ def explore(request):
 		if search_query != None:
 			courses = Course.objects.filter(title__icontains=search_query, published=True)
 		elif search_query_topic != None:
-			courses = Course.objects.filter(topic=search_query_topic,published=True)
+			courses = Course.objects.filter(topic=search_query_topic, published=True)
 		else:
 			courses = Course.objects.filter(published=True)
 			#courses = sorted(courses,reverse=True)
@@ -41,7 +44,7 @@ def explore(request):
 		return render(request, 'topics/explore.html', {'courses': courses})
 
 def coursedetail(request, course_id):
-	course =  get_object_or_404(Course,pk=course_id)
+	course =  get_object_or_404(Course,pk=course_id, published=True)
 	return render(request, 'topics/course_detail.html', {'course': course})
 
 
@@ -82,6 +85,10 @@ def editcourse(request,course_id):
 	print(course.id)
 
 	if request.method == 'POST':
+		if 'addglossary' in request.POST:
+			return redirect('glossary', course_id=course.id)
+		if 'newsection' in request.POST:
+			return redirect('newsection', course_id=course.id)
 		if 'removelabel' in request.POST:
 			label = request.POST['labelremove']
 			course.label.remove(label)
@@ -141,7 +148,7 @@ def savecourse(request,course):
 			course.label.add(newlabel)
 
 @login_required
-def newsection(request,course_id):
+def newsection(request, course_id):
 	course =  get_object_or_404(Course,pk=course_id)
 	numberofsections = course.section_set.count()
 	
@@ -178,9 +185,28 @@ def editsection(request,section_id):
 				return redirect('editcourse', course_id=section.course.id)
 			else:
 				return render(request, 'topics/editsection.html', {'section': section, 'error': 'Name filed is required'})
+		elif 'addresource' in request.POST:
+			return redirect('newresource', section_id=section.id)
 	else:
 		return render(request, 'topics/editsection.html',{'section': section})
 
+@login_required
+def glossary(request, course_id):
+	course =  get_object_or_404(Course,pk=course_id)
+	return render(request, 'topics/glossary.html',{'course': course})
+
+@login_required
+def newresource(request, section_id):
+	section =  get_object_or_404(Section,pk=section_id)
+	if request.method == 'POST':
+		resource = Resource()
+		resource.name = request.POST['resourcename']
+		resource.link = request.FILES['resource']
+		resource.section = section
+		resource.save()
+		return redirect('editsection', section_id=section.id)
+	else:
+		return render(request, 'topics/newresource.html',{'section': section})
 
 
 

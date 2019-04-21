@@ -10,18 +10,16 @@
 
 <div class="container-fluid" style="margin-top:40px;">
 
-	{% if error %}
 
-	<p style="color:red;" class="text-center"> {{error}} </p>
-
-	{%endif%}
-
-
-    <form method="POST" action="{% url 'newcourse' %}" enctype="multipart/form-data">
+    <form method="POST" action="{% url 'newresource' section.id %}" enctype="multipart/form-data">
     	{% csrf_token %}
 
-    {% include "temp/course_new_edit.html" %}
+                       <button type="submit" name="addglossary" class="btn btn-danger btn-block">Add Resource</button>
+                        <br />
 
+                        <input type="text" class="form-control" name="resourcename" placeholder="Resource Name">
+
+                        <input type="file" class="form-control-file" name="resource" >
     </form>
 
 </div>
@@ -31,4 +29,3 @@
 
 
 {%endblock%}
-
