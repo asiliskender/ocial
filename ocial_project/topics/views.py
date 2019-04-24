@@ -88,7 +88,13 @@ def editcourse(request,course_id):
 		if 'addglossary' in request.POST:
 			return redirect('glossary', course_id=course.id)
 		if 'newsection' in request.POST:
-			return redirect('newsection', course_id=course.id)
+			numberofsections = course.section_set.count()
+			section = Section()
+			section.name = request.POST['sectionname']
+			section.course = course
+			section.order = numberofsections +1
+			section.save()
+			return redirect('editsection', section_id=section.id)
 		if 'removelabel' in request.POST:
 			label = request.POST['labelremove']
 			course.label.remove(label)
@@ -186,7 +192,14 @@ def editsection(request,section_id):
 			else:
 				return render(request, 'topics/editsection.html', {'section': section, 'error': 'Name filed is required'})
 		elif 'addresource' in request.POST:
-			return redirect('newresource', section_id=section.id)
+			resource = Resource()
+			resource.name = request.POST['resourcename']
+			resource.link = request.FILES['resource']
+			resource.section = section
+			resource.save()
+			return redirect('editsection', section_id=section.id)
+		print("OSMANOSMAN")
+		return redirect('home')
 	else:
 		return render(request, 'topics/editsection.html',{'section': section})
 
@@ -194,20 +207,5 @@ def editsection(request,section_id):
 def glossary(request, course_id):
 	course =  get_object_or_404(Course,pk=course_id)
 	return render(request, 'topics/glossary.html',{'course': course})
-
-@login_required
-def newresource(request, section_id):
-	section =  get_object_or_404(Section,pk=section_id)
-	if request.method == 'POST':
-		resource = Resource()
-		resource.name = request.POST['resourcename']
-		resource.link = request.FILES['resource']
-		resource.section = section
-		resource.save()
-		return redirect('editsection', section_id=section.id)
-	else:
-		return render(request, 'topics/newresource.html',{'section': section})
-
-
 
 

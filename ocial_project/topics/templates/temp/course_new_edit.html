@@ -5,7 +5,36 @@
                     <input type="text" class="form-control" name="title" placeholder="Title" value="{{ course.title }}">
                     {% if course.id %}
                     <ul class="list-group mt-4" id="demo2">
-                        <button type="submit" name="newsection" class="btn btn-danger">New Section</button>
+                    <div class="modal fade" id="sectionModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                      <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">New Section</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                            <form>
+                              <div class="form-group">
+                                <input type="text" class="form-control" name="sectionname" placeholder="Section Name">
+                              </div>
+                            </form>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" name="newsection" class="btn btn-danger">New Section</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <button type="button" class="btn btn-danger btn-block" data-toggle="modal" data-target="#sectionModal" data-whatever="@getbootstrap">New Section</button>
+
+
+
+
+
 
 
                         {% for section in course.section_set.all %} 
