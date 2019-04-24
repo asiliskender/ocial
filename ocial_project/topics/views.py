@@ -153,26 +153,7 @@ def savecourse(request,course):
 			newlabel , created = Label.objects.get_or_create(name = label)
 			course.label.add(newlabel)
 
-@login_required
-def newsection(request, course_id):
-	course =  get_object_or_404(Course,pk=course_id)
-	numberofsections = course.section_set.count()
 	
-	if request.method == 'POST':
-		if 'save' in request.POST:
-			if request.POST['sectionname']:
-				section = Section()
-				section.name = request.POST['sectionname']
-				section.course = course
-				section.order = numberofsections +1
-				section.save()
-				return redirect('editsection', section_id=section.id)
-			else:
-				return render(request, 'topics/newsection.html',{'course': course,'error': 'Section name is required'})
-	else:
-		return render(request, 'topics/newsection.html',{'course': course})
-
-		
 @login_required
 def editsection(request,section_id):
 	section =  get_object_or_404(Section,pk=section_id)
@@ -183,23 +164,26 @@ def editsection(request,section_id):
 				section.save()
 				return redirect('editsection', section_id=section.id)
 			else:
-				return render(request, 'topics/editsection.html', {'section': section, 'error': 'Name filed is required'})		
+				return render(request, 'topics/editsection.html', {'section': section, 'error': 'Name field is required'})		
 		elif 'submit_section' in request.POST:
 			if request.POST['sectionname']:
 				section.name = request.POST['sectionname']
 				section.save()
 				return redirect('editcourse', course_id=section.course.id)
 			else:
-				return render(request, 'topics/editsection.html', {'section': section, 'error': 'Name filed is required'})
+				return render(request, 'topics/editsection.html', {'section': section, 'error': 'Name field is required'})
 		elif 'addresource' in request.POST:
-			resource = Resource()
-			resource.name = request.POST['resourcename']
-			resource.link = request.FILES['resource']
-			resource.section = section
-			resource.save()
-			return redirect('editsection', section_id=section.id)
-		print("OSMANOSMAN")
-		return redirect('home')
+			if request.FILES.get('resource', False) and request.POST['resourcename']:
+				print("sdfsfsfsf----------")
+				resource = Resource()
+				resource.name = request.POST['resourcename']
+				resource.link = request.FILES['resource']
+				resource.section = section
+				resource.save()
+				return redirect('editsection', section_id=section.id)
+			else:
+				return render(request, 'topics/editsection.html', {'section': section, 'error': 'Source and Source Name fields are required'})
+		return render(request, 'topics/editsection.html',{'section': section})
 	else:
 		return render(request, 'topics/editsection.html',{'section': section})
 
