@@ -45,6 +45,8 @@ class Section(models.Model):
 	name = models.CharField(max_length=200)
 	course = models.ForeignKey('Course', on_delete=models.CASCADE)
 	order =  models.IntegerField(default=1)
+	description = models.TextField(blank=True)
+
 
 	class Meta:
 		ordering = ['order']

@@ -12,6 +12,10 @@ urlpatterns = [
     path('topics',views.topics, name= 'topics'),
     path('explore',views.explore, name= 'explore'),
     path('course/<int:course_id>/', views.coursedetail, name = 'coursedetail'),
+    path('deletelabel/<int:course_id>/<int:label_id>/', views.deletelabel, name = 'deletelabel'),
+    path('deletesection/<int:course_id>/<int:section_id>/', views.deletesection, name = 'deletesection'),
+
+
 
 
 

@@ -95,11 +95,6 @@ def editcourse(request,course_id):
 			section.order = numberofsections +1
 			section.save()
 			return redirect('editsection', section_id=section.id)
-		if 'removelabel' in request.POST:
-			label = request.POST['labelremove']
-			course.label.remove(label)
-			return redirect('editcourse', course_id=course.id)
-
 		if 'newtopic' in request.POST:
 			topic , created = Topic.objects.get_or_create(title=request.POST['topictitle'])
 			topic.save()
@@ -191,5 +186,19 @@ def editsection(request,section_id):
 def glossary(request, course_id):
 	course =  get_object_or_404(Course,pk=course_id)
 	return render(request, 'topics/glossary.html',{'course': course})
+
+@login_required
+def deletelabel(request,label_id, course_id):
+	label = get_object_or_404(Label,pk=label_id)
+	course =  get_object_or_404(Course,pk=course_id)
+	course.label.remove(label)
+	return redirect('editcourse', course_id=course.id)
+
+@login_required
+def deletesection(request,section_id,course_id):
+	section = get_object_or_404(Section,pk=section_id)
+	section.delete()
+	return redirect('editcourse', course_id=course_id)
+
 
 

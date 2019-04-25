@@ -1,25 +1,77 @@
-{% extends '../temp/classroom_base.html' %}
-
-{% load static %}   
-
-
+{% extends '../temp/classroom_base.html' %} 
+{% load static %} 
 {% block content %}
-
 
 <div class="container-fluid" style="margin-top:40px;">
 
-	{% if error %}
+    {% if error %}
 
-	<p style="color:red;" class="text-center"> {{error}} </p>
+    <p style="color:red;" class="text-center"> {{error}} </p>
 
-	{%endif%}
+    {%endif%}
 
     <form method="POST" action="{% url 'editsection' section.id %}" enctype="multipart/form-data">
         {% csrf_token %}
 
-    {% include "temp/section_new_edit.html" %}
+        <div class="form-group">
 
-    </form>
+            <div class="row">
+                <div class="col-sm-8">
+                    <small>{{course.title}}</small> {% if section.id %}<small>{{section.course}}</small>{% endif %}
+                    <input type="text" class="form-control" name="sectionname" placeholder="Section Name" value="{{ section.name }}">
+                </div>
+
+                <div class="col-sm-4">
+
+                    {% if section.id %}
+                    <ul class="list-group mt-4" id="demo2">
+                        {% for resource in section.resource_set.all %}
+                        <li class="list-group-item"><a target="_blank" href="{{resource.link.url}}">{{resource.name}}</a></li>
+                        {% endfor %}
+
+                    </ul>
+
+                    <div class="modal fade" id="resourceModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">New Resource</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <form>
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" name="resourcename" placeholder="Resource Name">
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="file" class="form-control-file" name="resource">
+                                        </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="submit" name="addresource" class="btn btn-danger"><i class="fas fa-plus"></i> Add Resource</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn btn-danger btn-block" data-toggle="modal" data-target="#resourceModal" data-whatever="@getbootstrap"><i class="fas fa-plus"></i> Add Resource</button>
+
+                    {% endif %}
+
+                    <button type="submit" name="save" class="btn btn-danger btn-block"><i class="far fa-save"></i> Save</button>
+                    {% if section.id %}
+                    <button type="submit" name="submit_section" class="btn btn-danger btn-block">Submit</button>
+
+                    <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletesection' section.course.id section.id %}';" class="btn btn-block btn-outline-danger" style="margin-bottom: 5px;"><i class="far fa-trash-alt"></i> Delete Section</button>
+
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        </form>
 
 </div>
 
