@@ -200,5 +200,16 @@ def deletesection(request,section_id,course_id):
 	section.delete()
 	return redirect('editcourse', course_id=course_id)
 
+@login_required
+def deleteresource(request,resource_id,section_id):
+	resource = get_object_or_404(Resource,pk=resource_id)
+	resource.delete()
+	return redirect('editsection', section_id=section_id)
+
+@login_required
+def deletecourse(request,course_id):
+	course =  get_object_or_404(Course,pk=course_id)
+	course.delete()
+	return redirect('teacher')
 
 

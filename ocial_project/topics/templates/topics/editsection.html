@@ -26,7 +26,12 @@
                     {% if section.id %}
                     <ul class="list-group mt-4" id="demo2">
                         {% for resource in section.resource_set.all %}
-                        <li class="list-group-item"><a target="_blank" href="{{resource.link.url}}">{{resource.name}}</a></li>
+                        <li class="list-group-item"><a target="_blank" href="{{resource.link.url}}">{{resource.name}}</a>
+
+                        <button style="float: right;" type="button" onclick="window.location.href='{% url 'deleteresource' section.id resource.id %}';" class="btn btn-outline-danger"><i class="far fa-trash-alt"></i></button>
+
+
+                        </li>
                         {% endfor %}
 
                     </ul>
