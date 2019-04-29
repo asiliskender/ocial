@@ -149,23 +149,18 @@ def savecourse(request,course):
 			course.label.add(newlabel)
 
 def ordersection(request,course):
-	if 'section-order' in request.POST:
+	if request.POST['section-order']:
 		order_array = request.POST['section-order']
 		order_array = order_array.split(',')
 
-		order = []
+		i = 1
 
 		for section_id in order_array:
 			section = get_object_or_404(Section,pk=section_id)
-			order.append(section)
+			section.order = i
+			section.save()
+			i += 1
 
-		print("************")
-		print(order_array)
-		print(order)
-		print("************")
-
-
-	
 @login_required
 def editsection(request,section_id):
 	section =  get_object_or_404(Section,pk=section_id)
