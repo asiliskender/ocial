@@ -82,8 +82,6 @@ def newcourse(request):
 def editcourse(request,course_id):
 	course =  get_object_or_404(Course,pk=course_id) 
 	topics = Topic.objects.all()
-	print(course.id)
-
 	if request.method == 'POST':
 		if 'addglossary' in request.POST:
 			return redirect('glossary', course_id=course.id)
@@ -117,12 +115,14 @@ def editcourse(request,course_id):
 				course.save()
 				return redirect('teacher')
 			else:
-				return render(request, 'topics/editcourse.html', {'topics': topics , 'course': course, 'error': 'Title and Topic fields are required'})
-
+				return render(request, 'topics/editcourse.html', {'topics': topics , 'course': course, 'error': 'Title and Topic fields are required'})	
+		return render(request, 'topics/editcourse.html',{'topics': topics ,'course': course},)
 	else:
 		return render(request, 'topics/editcourse.html',{'topics': topics ,'course': course},)
 
 def savecourse(request,course):
+
+	ordersection(request,course)
 
 	course.title = request.POST['title']
 	course.description = request.POST['description']
@@ -147,6 +147,23 @@ def savecourse(request,course):
 		for label in labels:
 			newlabel , created = Label.objects.get_or_create(name = label)
 			course.label.add(newlabel)
+
+def ordersection(request,course):
+	if 'section-order' in request.POST:
+		order_array = request.POST['section-order']
+		order_array = order_array.split(',')
+
+		order = []
+
+		for section_id in order_array:
+			section = get_object_or_404(Section,pk=section_id)
+			order.append(section)
+
+		print("************")
+		print(order_array)
+		print(order)
+		print("************")
+
 
 	
 @login_required
