@@ -19,6 +19,12 @@
                 <div class="col-sm-8">
                     <small>{{course.title}}</small> {% if section.id %}<small>{{section.course}}</small>{% endif %}
                     <input type="text" class="form-control" name="sectionname" placeholder="Section Name" value="{{ section.name }}">
+
+                    <br />
+
+
+                    <textarea type="text" class="form-control" name="sectiondescription" rows="4" placeholder="Section Description">{{ section.description }}</textarea>
+
                 </div>
 
                 <div class="col-sm-4">

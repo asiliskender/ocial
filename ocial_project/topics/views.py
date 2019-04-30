@@ -148,13 +148,13 @@ def savecourse(request,course):
 			newlabel , created = Label.objects.get_or_create(name = label)
 			course.label.add(newlabel)
 
+@login_required
 def ordersection(request,course):
 	if request.POST['section-order']:
 		order_array = request.POST['section-order']
 		order_array = order_array.split(',')
 
 		i = 1
-
 		for section_id in order_array:
 			section = get_object_or_404(Section,pk=section_id)
 			section.order = i
@@ -168,6 +168,7 @@ def editsection(request,section_id):
 		if 'save' in request.POST:
 			if request.POST['sectionname']:
 				section.name = request.POST['sectionname']
+				section.description = request.POST['sectiondescription']
 				section.save()
 				return redirect('editsection', section_id=section.id)
 			else:
@@ -175,13 +176,13 @@ def editsection(request,section_id):
 		elif 'submit_section' in request.POST:
 			if request.POST['sectionname']:
 				section.name = request.POST['sectionname']
+				section.description = request.POST['sectiondescription']
 				section.save()
 				return redirect('editcourse', course_id=section.course.id)
 			else:
 				return render(request, 'topics/editsection.html', {'section': section, 'error': 'Name field is required'})
 		elif 'addresource' in request.POST:
 			if request.FILES.get('resource', False) and request.POST['resourcename']:
-				print("sdfsfsfsf----------")
 				resource = Resource()
 				resource.name = request.POST['resourcename']
 				resource.link = request.FILES['resource']

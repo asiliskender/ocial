@@ -55,8 +55,7 @@
 
             <div class="row">
                 <div class="col-sm-8">
-                    <input type="text" class="form-control" name="title" placeholder="Title" value="{{ course.title }}"> 
-                    {% if course.id %}
+                    <input type="text" class="form-control" name="title" placeholder="Title" value="{{ course.title }}"> {% if course.id %}
                     <input type="hidden" name="section-order" id="section-order">
 
                     <ul class="list-group mt-4" id="demo2">
@@ -162,7 +161,6 @@
 
                     <br />
 
-
                     <button type="submit" name="save" id="save" class="btn btn-danger"><i class="far fa-save"></i> Save</button>
                     {% if course.id %}
                     <button type="submit" name="publish" id="publish" class="btn btn-danger">Publish</button>
@@ -173,11 +171,8 @@
                 </div>
             </div>
         </div>
-        
 
     </form>
-
-
 
     <script>
         function openForm() {
@@ -195,28 +190,21 @@
             dragAxis: 'y'
         });
 
-
-        document.getElementById("save").onclick = function() {sendSectionOrder()};
-        document.getElementById("publish").onclick = function() {sendSectionOrder()};
-
+        document.getElementById("save").onclick = function() {
+            sendSectionOrder()
+        };
+        document.getElementById("publish").onclick = function() {
+            sendSectionOrder()
+        };
 
         function sendSectionOrder() {
 
-
-        var order = document.getElementById("section-order");
-        order.value = grid.getItems().map(item => item.getElement().getAttribute('data-id'));
-        order.form.submit();
+            var order = document.getElementById("section-order");
+            order.value = grid.getItems().map(item => item.getElement().getAttribute('data-id'));
+            order.form.submit();
 
         }
-
     </script>
-
-
-
-
-
-
-
 
 </div>
 
