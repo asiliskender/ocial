@@ -7,6 +7,8 @@ import operator
 import requests
 import json
 from wikidata.client import Client
+from itertools import chain
+
 
 
 
@@ -121,7 +123,6 @@ def editcourse(request,course_id):
 		return render(request, 'topics/editcourse.html',{'topics': topics ,'course': course},)
 
 def savecourse(request,course):
-
 	ordersection(request,course)
 
 	course.title = request.POST['title']
@@ -149,6 +150,27 @@ def savecourse(request,course):
 			course.label.add(newlabel)
 
 @login_required
+def glossary(request, course_id):
+	course =  get_object_or_404(Course,pk=course_id)
+	return render(request, 'topics/glossary.html',{'course': course})
+
+
+@login_required
+def deletecourse(request,course_id):
+	course =  get_object_or_404(Course,pk=course_id)
+	course.delete()
+	return redirect('teacher')
+
+@login_required
+def deletelabel(request,label_id, course_id):
+	label = get_object_or_404(Label,pk=label_id)
+	course =  get_object_or_404(Course,pk=course_id)
+	course.label.remove(label)
+	return redirect('editcourse', course_id=course.id)
+
+
+
+@login_required
 def ordersection(request,course):
 	if request.POST['section-order']:
 		order_array = request.POST['section-order']
@@ -164,6 +186,8 @@ def ordersection(request,course):
 @login_required
 def editsection(request,section_id):
 	section =  get_object_or_404(Section,pk=section_id)
+	learningpath = getlearningpath(section_id)
+	print(learningpath)
 	if request.method == 'POST':
 		if 'save' in request.POST:
 			if request.POST['sectionname']:
@@ -190,22 +214,18 @@ def editsection(request,section_id):
 				resource.save()
 				return redirect('editsection', section_id=section.id)
 			else:
-				return render(request, 'topics/editsection.html', {'section': section, 'error': 'Source and Source Name fields are required'})
-		return render(request, 'topics/editsection.html',{'section': section})
+				return render(request, 'topics/editsection.html', {'section': section, 'learningpath': learningpath, 'error': 'Source and Source Name fields are required'})
+		return render(request, 'topics/editsection.html',{'section': section, 'learningpath': learningpath})
 	else:
-		return render(request, 'topics/editsection.html',{'section': section})
+		return render(request, 'topics/editsection.html',{'section': section, 'learningpath': learningpath})
 
-@login_required
-def glossary(request, course_id):
-	course =  get_object_or_404(Course,pk=course_id)
-	return render(request, 'topics/glossary.html',{'course': course})
-
-@login_required
-def deletelabel(request,label_id, course_id):
-	label = get_object_or_404(Label,pk=label_id)
-	course =  get_object_or_404(Course,pk=course_id)
-	course.label.remove(label)
-	return redirect('editcourse', course_id=course.id)
+def getlearningpath(section_id):
+    lectures = Lecture.objects.filter(section= section_id)
+    quizs = Quiz.objects.filter(section= section_id)
+    learningpath = sorted(
+        chain(lectures, quizs),
+        key=lambda item: item.order, reverse=False)
+    return learningpath
 
 @login_required
 def deletesection(request,section_id,course_id):
@@ -218,11 +238,3 @@ def deleteresource(request,resource_id,section_id):
 	resource = get_object_or_404(Resource,pk=resource_id)
 	resource.delete()
 	return redirect('editsection', section_id=section_id)
-
-@login_required
-def deletecourse(request,course_id):
-	course =  get_object_or_404(Course,pk=course_id)
-	course.delete()
-	return redirect('teacher')
-
-

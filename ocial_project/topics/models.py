@@ -41,6 +41,16 @@ class Label(models.Model):
 	def __str__(self):
 		return self.name
 
+class Glossary(models.Model):
+	name = models.CharField(max_length=200)
+	image = models.ImageField(upload_to='images/', blank=True)
+	description = models.TextField(blank=True)
+	course = models.ForeignKey('Course', on_delete=models.CASCADE)
+
+
+	def __str__(self):
+		return self.name
+
 class Section(models.Model):
 	name = models.CharField(max_length=200)
 	course = models.ForeignKey('Course', on_delete=models.CASCADE)
@@ -54,15 +64,30 @@ class Section(models.Model):
 	def __str__(self):
 		return self.name
 
-class Glossary(models.Model):
-	name = models.CharField(max_length=200)
-	image = models.ImageField(upload_to='images/', blank=True)
-	description = models.TextField(blank=True)
-	course = models.ForeignKey('Course', on_delete=models.CASCADE)
+class Lecture(models.Model):
+	title = models.CharField(max_length=200)
+	body = models.TextField(blank=True)
+	section = models.ForeignKey('Section', on_delete=models.CASCADE)
+	order =  models.IntegerField(default=1)
 
+	class Meta:
+		ordering = ['order']
+		verbose_name = 'Lecture'
 
 	def __str__(self):
-		return self.name
+		return self.title
+
+class Quiz(models.Model):
+	title = models.CharField(max_length=200)
+	section = models.ForeignKey('Section', on_delete=models.CASCADE)
+	order =  models.IntegerField(default=1)
+
+	class Meta:
+		ordering = ['order']
+		verbose_name = 'Quiz'
+
+	def __str__(self):
+		return self.title
 
 class Resource(models.Model):
 	name = models.CharField(max_length=200, blank=True)
