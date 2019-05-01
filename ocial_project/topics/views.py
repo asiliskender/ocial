@@ -123,7 +123,7 @@ def editcourse(request,course_id):
 		return render(request, 'topics/editcourse.html',{'topics': topics ,'course': course},)
 
 def savecourse(request,course):
-	ordersection(request,course)
+	ordersection(request)
 
 	course.title = request.POST['title']
 	course.description = request.POST['description']
@@ -171,7 +171,7 @@ def deletelabel(request,label_id, course_id):
 
 
 @login_required
-def ordersection(request,course):
+def ordersection(request):
 	if request.POST['section-order']:
 		order_array = request.POST['section-order']
 		order_array = order_array.split(',')
@@ -187,26 +187,23 @@ def ordersection(request,course):
 def editsection(request,section_id):
 	section =  get_object_or_404(Section,pk=section_id)
 	learningpath = getlearningpath(section_id)
-	print(learningpath)
+
 	if request.method == 'POST':
-		if 'save' in request.POST:
+		if 'save_section' in request.POST:
 			if request.POST['sectionname']:
-				section.name = request.POST['sectionname']
-				section.description = request.POST['sectiondescription']
-				section.save()
+				savesection(request,section)
 				return redirect('editsection', section_id=section.id)
 			else:
 				return render(request, 'topics/editsection.html', {'section': section, 'error': 'Name field is required'})		
 		elif 'submit_section' in request.POST:
 			if request.POST['sectionname']:
-				section.name = request.POST['sectionname']
-				section.description = request.POST['sectiondescription']
-				section.save()
+				savesection(request,section)
 				return redirect('editcourse', course_id=section.course.id)
 			else:
 				return render(request, 'topics/editsection.html', {'section': section, 'error': 'Name field is required'})
 		elif 'addresource' in request.POST:
 			if request.FILES.get('resource', False) and request.POST['resourcename']:
+				print("111111111")
 				resource = Resource()
 				resource.name = request.POST['resourcename']
 				resource.link = request.FILES['resource']
@@ -214,10 +211,42 @@ def editsection(request,section_id):
 				resource.save()
 				return redirect('editsection', section_id=section.id)
 			else:
-				return render(request, 'topics/editsection.html', {'section': section, 'learningpath': learningpath, 'error': 'Source and Source Name fields are required'})
+				return render(request, 'topics/editsection.html', {'section': section, 'learningpath': learningpath, 'error': 'Resource and Resource Name fields are required'})
 		return render(request, 'topics/editsection.html',{'section': section, 'learningpath': learningpath})
 	else:
 		return render(request, 'topics/editsection.html',{'section': section, 'learningpath': learningpath})
+
+def savesection(request,section):
+	
+	orderlp(request,section)
+
+	section.name = request.POST['sectionname']
+	section.description = request.POST['sectiondescription']
+	section.save()
+
+
+
+@login_required
+def orderlp(request,section):
+	if request.POST['lp-order']:
+		order_array = request.POST['lp-order']
+		order_array = order_array.split(',')
+
+		i = 1
+		for lp_item in order_array:
+			item = lp_item.split(':')
+			itemtype = item[0]
+			itemid = item[1]
+			if itemtype == Lecture._meta.verbose_name:
+				lecture = get_object_or_404(Lecture,pk=itemid)
+				lecture.order = i
+				lecture.save()
+			elif itemtype == Quiz._meta.verbose_name:
+				quiz = get_object_or_404(Quiz,pk=itemid)
+				quiz.order = i
+				quiz.save()
+			i += 1
+
 
 def getlearningpath(section_id):
     lectures = Lecture.objects.filter(section= section_id)

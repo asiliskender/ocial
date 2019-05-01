@@ -1,6 +1,4 @@
-{% extends '../temp/classroom_base.html' %} 
-{% load static %} 
-{% block content %}
+{% extends '../temp/classroom_base.html' %} {% load static %} {% load my_tags %} {% block content %}
 
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.11/summernote-lite.css" rel="stylesheet">
@@ -42,8 +40,6 @@
     }
 </style>
 
-
-
 <div class="container-fluid" style="margin-top:40px;">
 
     {% if error %}
@@ -64,43 +60,70 @@
 
                     <br />
 
-
                     <textarea type="text" class="form-control" name="sectiondescription" rows="4" placeholder="Section Description">{{ section.description }}</textarea>
 
+                    <div class="modal fade" id="lectureModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">New Learning Path Item</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <form>
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" name="itemtitle" placeholder="Title">
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary " data-dismiss="modal">Close</button>
+                                    <button type="submit" name="newquiz" class="btn btn-danger "><i class="fas fa-question"></i> New Quiz </button>
+                                    <button type="submit" name="newlecture" class="btn btn-danger "><i class="fas fa-chalkboard-teacher"></i> New Lecture</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                        <ul class="grid">
-                            {% load my_tags %}
+                    <br />
 
-                            {% for pathitem in learningpath %}
-                            <li class="item" data-id={{pathitem|verbose_name}}:{{pathitem.id}}><a href="#">{{pathitem.order}}. {{pathitem|verbose_name}}: {{pathitem.title}}</a>
+                    <button type="button" class="btn btn-danger btn-block" data-toggle="modal" data-target="#lectureModal" data-whatever="@getbootstrap"><i class="fas fa-plus"></i> Add</button>
 
-                            </li>
+                    <input type="hidden" name="lp-order" id="lp-order">
 
-                            {% endfor %}
-                        </ul>
+                    <ul class="grid">
 
-                        <script src="https://unpkg.com/web-animations-js@2.3.1/web-animations.min.js"></script>
-                        <script src="https://unpkg.com/hammerjs@2.0.8/hammer.min.js"></script>
-                        <script src="https://unpkg.com/muuri@0.7.1/dist/muuri.min.js"></script>
+                        {% for pathitem in learningpath %}
+                        <li class="item" data-id={{pathitem|verbose_name}}:{{pathitem.id}}><a href="#">{{pathitem.order}}. {{pathitem|verbose_name}}: {{pathitem.title}}</a>
 
+                            <button style="float: right;" type="button" onclick="window.location.href='{% url 'home'%}';" class="btn btn-pill btn-outline-danger"><i class="far fa-trash-alt"></i></button>
+
+                        </li>
+
+                        {% endfor %}
+                    </ul>
+
+                    <script src="https://unpkg.com/web-animations-js@2.3.1/web-animations.min.js"></script>
+                    <script src="https://unpkg.com/hammerjs@2.0.8/hammer.min.js"></script>
+                    <script src="https://unpkg.com/muuri@0.7.1/dist/muuri.min.js"></script>
 
                 </div>
 
                 <div class="col-sm-4">
 
                     {% if section.id %}
-                    <ul class="list-group mt-4" id="demo2">
+                    <ul class="list-group mt-4">
                         {% for resource in section.resource_set.all %}
                         <li class="list-group-item"><a target="_blank" href="{{resource.link.url}}">{{resource.name}}</a>
 
-                        <button style="float: right;" type="button" onclick="window.location.href='{% url 'deleteresource' section.id resource.id %}';" class="btn btn-outline-danger"><i class="far fa-trash-alt"></i></button>
-
+                            <button style="float: right;" type="button" onclick="window.location.href='{% url 'deleteresource' section.id resource.id %}';" class="btn btn-outline-danger"><i class="far fa-trash-alt"></i></button>
 
                         </li>
                         {% endfor %}
 
                     </ul>
-
 
                     <div class="modal fade" id="resourceModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                         <div class="modal-dialog" role="document">
@@ -112,13 +135,14 @@
                                     </button>
                                 </div>
                                 <div class="modal-body">
-                                    <form>
-                                        <div class="form-group">
-                                            <input type="text" class="form-control" name="resourcename" placeholder="Resource Name">
-                                        </div>
-                                        <div class="form-group">
-                                            <input type="file" class="form-control-file" name="resource">
-                                        </div>
+
+                                    <div class="form-group">
+                                        <input type="text" class="form-control" name="resourcename" placeholder="Resource Name">
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="file" class="form-control-file" name="resource">
+                                    </div>
+
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -132,9 +156,9 @@
 
                     {% endif %}
 
-                    <button type="submit" name="save" class="btn btn-danger btn-block"><i class="far fa-save"></i> Save</button>
+                    <button type="submit" name="save_section" id="save_section" class="btn btn-danger btn-block"><i class="far fa-save"></i> Save</button>
                     {% if section.id %}
-                    <button type="submit" name="submit_section" class="btn btn-danger btn-block">Submit</button>
+                    <button type="submit" name="submit_section" id="submit_section" class="btn btn-danger btn-block">Submit</button>
 
                     <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletesection' section.course.id section.id %}';" class="btn btn-block btn-outline-danger" style="margin-bottom: 5px;"><i class="far fa-trash-alt"></i> Delete Section</button>
 
@@ -142,7 +166,7 @@
                 </div>
             </div>
         </div>
-        </form>
+    </form>
 
     <script type="text/javascript">
         var grid = new Muuri('.grid', {
@@ -150,6 +174,20 @@
             dragAxis: 'y'
         });
 
+        document.getElementById("save_section").onclick = function() {
+            sendLPOrder()
+        };
+        document.getElementById("submit_section").onclick = function() {
+            sendLPOrder()
+        };
+
+        function sendLPOrder() {
+
+            var lp_order = document.getElementById("lp-order");
+            lp_order.value = grid.getItems().map(item => item.getElement().getAttribute('data-id'));
+            lp_order.form.submit();
+
+        }
     </script>
 
 </div>
