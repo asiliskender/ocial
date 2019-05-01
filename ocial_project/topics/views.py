@@ -203,7 +203,6 @@ def editsection(request,section_id):
 				return render(request, 'topics/editsection.html', {'section': section, 'error': 'Name field is required'})
 		elif 'addresource' in request.POST:
 			if request.FILES.get('resource', False) and request.POST['resourcename']:
-				print("111111111")
 				resource = Resource()
 				resource.name = request.POST['resourcename']
 				resource.link = request.FILES['resource']
@@ -212,6 +211,22 @@ def editsection(request,section_id):
 				return redirect('editsection', section_id=section.id)
 			else:
 				return render(request, 'topics/editsection.html', {'section': section, 'learningpath': learningpath, 'error': 'Resource and Resource Name fields are required'})
+		elif 'newlecture' in request.POST:
+			if request.POST['itemtitle']:
+				lecture = Lecture()
+				lecture.title = request.POST['itemtitle']
+				lecture.section = section
+				lecture.order = len(learningpath)+1
+				lecture.save()
+				return redirect('editlecture', lecture_id=lecture.id)
+		elif 'newquiz' in request.POST:
+			if request.POST['itemtitle']:
+				quiz = Quiz()
+				quiz.title = request.POST['itemtitle']
+				quiz.section = section
+				quiz.order = len(learningpath)+1
+				quiz.save()
+				return redirect('editquiz', quiz_id=quiz.id)
 		return render(request, 'topics/editsection.html',{'section': section, 'learningpath': learningpath})
 	else:
 		return render(request, 'topics/editsection.html',{'section': section, 'learningpath': learningpath})
@@ -223,6 +238,14 @@ def savesection(request,section):
 	section.name = request.POST['sectionname']
 	section.description = request.POST['sectiondescription']
 	section.save()
+
+def editlecture(request, lecture_id):
+	lecture =  get_object_or_404(Lecture,pk=lecture_id)
+	return render(request, 'topics/editlecture.html',{'lecture': lecture})
+
+def editquiz(request, quiz_id):
+	quiz =  get_object_or_404(Quiz,pk=quiz_id)
+	return render(request, 'topics/editquiz.html',{'quiz': quiz})
 
 
 
@@ -257,13 +280,30 @@ def getlearningpath(section_id):
     return learningpath
 
 @login_required
-def deletesection(request,section_id,course_id):
+def deletesection(request,section_id):
 	section = get_object_or_404(Section,pk=section_id)
+	course_id = section.course.id
 	section.delete()
 	return redirect('editcourse', course_id=course_id)
 
 @login_required
-def deleteresource(request,resource_id,section_id):
+def deletelecture(request,lecture_id):
+	lecture = get_object_or_404(Lecture,pk=lecture_id)
+	section_id = lecture.section.id
+	lecture.delete()
+	return redirect('editsection', section_id=section_id)
+
+@login_required
+def deletequiz(request,quiz_id):
+	quiz = get_object_or_404(Quiz,pk=quiz_id)
+	section_id = quiz.section.id
+	quiz.delete()
+	return redirect('editsection', section_id=section_id)
+
+
+@login_required
+def deleteresource(request,resource_id):
 	resource = get_object_or_404(Resource,pk=resource_id)
+	section_id = resource.section.id
 	resource.delete()
 	return redirect('editsection', section_id=section_id)

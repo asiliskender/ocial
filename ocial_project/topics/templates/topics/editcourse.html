@@ -90,7 +90,7 @@
                             {% for section in course.section_set.all %}
                             <li class="item" data-id={{section.id}}><a href="{% url 'editsection' section.id %}">Section {{section.order}}: {{section.name}}</a>
 
-                                <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletesection' course.id section.id %}';" class="btn btn-pill btn-outline-danger"><i class="far fa-trash-alt"></i></button>
+                                <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletesection' section.id %}';" class="btn btn-pill btn-outline-danger"><i class="far fa-trash-alt"></i></button>
 
                             </li>
 
@@ -133,11 +133,13 @@
                     <label for="exampleFormControlSelect1">Topic</label>
                     <select class="form-control" name="topic">
                         <option disabled selected>Select topic</option>
-                        {% for topic in topics.all %} {% if topic.id == course.topic.id %}
+                        {% for topic in topics.all %} 
+                        {% if topic.id == course.topic.id %}
                         <option selected value="{{ topic.id }}">{{ topic }}</option>
                         {% else %}
                         <option value="{{ topic.id }}">{{ topic }}</option>
-                        {% endif %} {% endfor %}
+                        {% endif %} 
+                        {% endfor %}
                     </select>
                     <br />
 

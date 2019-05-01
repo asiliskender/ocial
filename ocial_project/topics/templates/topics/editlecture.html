@@ -1,0 +1,44 @@
+{% extends '../temp/classroom_base.html' %} {% load static %} {% load my_tags %} {% block content %}
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.11/summernote-lite.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.11/summernote-lite.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/RubaXa/Sortable/Sortable.min.js"></script>
+
+
+
+<div class="container-fluid" style="margin-top:40px;">
+
+    {% if error %}
+
+    <p style="color:red;" class="text-center"> {{error}} </p>
+
+    {%endif%}
+
+    <form method="POST" action="{% url 'editlecture' lecture.id %}" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="form-group">
+
+            
+                
+                    {% if lecture.id %}<small>{{lecture.section}}</small>{% endif %}
+                    <input type="text" class="form-control" name="lecturetitle" placeholder="Lecture Title" value="{{ lecture.title }}">
+
+                    <br />
+
+                    <textarea type="text" class="form-control" name="lecturebody" rows="4" placeholder="LectureBody">{{ lecture.body }}</textarea>
+
+
+                    <br />
+
+
+          
+        </div>
+    </form>
+
+
+
+</div>
+
+{%endblock%}

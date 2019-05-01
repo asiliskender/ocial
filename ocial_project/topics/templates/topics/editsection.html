@@ -55,7 +55,7 @@
 
             <div class="row">
                 <div class="col-sm-8">
-                    <small>{{course.title}}</small> {% if section.id %}<small>{{section.course}}</small>{% endif %}
+                    {% if section.id %}<small>{{section.course}}</small>{% endif %}
                     <input type="text" class="form-control" name="sectionname" placeholder="Section Name" value="{{ section.name }}">
 
                     <br />
@@ -95,10 +95,24 @@
 
                     <ul class="grid">
 
-                        {% for pathitem in learningpath %}
-                        <li class="item" data-id={{pathitem|verbose_name}}:{{pathitem.id}}><a href="#">{{pathitem.order}}. {{pathitem|verbose_name}}: {{pathitem.title}}</a>
+                    {% for pathitem in learningpath %}
 
-                            <button style="float: right;" type="button" onclick="window.location.href='{% url 'home'%}';" class="btn btn-pill btn-outline-danger"><i class="far fa-trash-alt"></i></button>
+                        {%if pathitem|verbose_name == "Lecture" %}
+ 
+
+                        <li class="item" data-id={{pathitem|verbose_name}}:{{pathitem.id}}><a href="{% url 'editlecture' pathitem.id%}">{{pathitem.order}}. {{pathitem|verbose_name}}: {{pathitem.title}}</a>
+
+                         <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletelecture' pathitem.id %}';" class="btn btn-pill btn-outline-danger"><i class="far fa-trash-alt"></i></button>
+
+                        {%else%}
+
+                        <li class="item" data-id={{pathitem|verbose_name}}:{{pathitem.id}}><a href="{% url 'editquiz' pathitem.id%}">{{pathitem.order}}. {{pathitem|verbose_name}}: {{pathitem.title}}</a>
+
+                         <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletequiz' pathitem.id %}';" class="btn btn-pill btn-outline-danger"><i class="far fa-trash-alt"></i></button>
+                        
+                        {%endif%}    
+
+                           
 
                         </li>
 
@@ -118,12 +132,14 @@
                         {% for resource in section.resource_set.all %}
                         <li class="list-group-item"><a target="_blank" href="{{resource.link.url}}">{{resource.name}}</a>
 
-                            <button style="float: right;" type="button" onclick="window.location.href='{% url 'deleteresource' section.id resource.id %}';" class="btn btn-outline-danger"><i class="far fa-trash-alt"></i></button>
+                            <button style="float: right;" type="button" onclick="window.location.href='{% url 'deleteresource' resource.id %}';" class="btn btn-outline-danger"><i class="far fa-trash-alt"></i></button>
 
                         </li>
                         {% endfor %}
 
                     </ul>
+
+                    <br />
 
                     <div class="modal fade" id="resourceModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                         <div class="modal-dialog" role="document">
@@ -160,7 +176,7 @@
                     {% if section.id %}
                     <button type="submit" name="submit_section" id="submit_section" class="btn btn-danger btn-block">Submit</button>
 
-                    <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletesection' section.course.id section.id %}';" class="btn btn-block btn-outline-danger" style="margin-bottom: 5px;"><i class="far fa-trash-alt"></i> Delete Section</button>
+                    <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletesection' section.id %}';" class="btn btn-block btn-outline-danger" style="margin-bottom: 5px;"><i class="far fa-trash-alt"></i> Delete Section</button>
 
                     {% endif %}
                 </div>
