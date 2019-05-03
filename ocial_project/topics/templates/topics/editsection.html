@@ -1,8 +1,6 @@
 {% extends '../temp/classroom_base.html' %} {% load static %} {% load my_tags %} {% block content %}
 
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.11/summernote-lite.css" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.11/summernote-lite.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/RubaXa/Sortable/Sortable.min.js"></script>
 
 <style type="text/css">
@@ -95,28 +93,23 @@
 
                     <ul class="grid">
 
-                    {% for pathitem in learningpath %}
-
-                        {%if pathitem|verbose_name == "Lecture" %}
- 
+                        {% for pathitem in learningpath %} {%if pathitem|verbose_name == "Lecture" %}
 
                         <li class="item" data-id={{pathitem|verbose_name}}:{{pathitem.id}}><a href="{% url 'editlecture' pathitem.id%}">{{pathitem.order}}. {{pathitem|verbose_name}}: {{pathitem.title}}</a>
 
-                         <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletelecture' pathitem.id %}';" class="btn btn-pill btn-outline-danger"><i class="far fa-trash-alt"></i></button>
+                            <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletelecture' pathitem.id %}';" class="btn btn-pill btn-outline-danger"><i class="far fa-trash-alt"></i></button>
 
-                        {%else%}
+                            {%else%}
 
-                        <li class="item" data-id={{pathitem|verbose_name}}:{{pathitem.id}}><a href="{% url 'editquiz' pathitem.id%}">{{pathitem.order}}. {{pathitem|verbose_name}}: {{pathitem.title}}</a>
+                            <li class="item" data-id={{pathitem|verbose_name}}:{{pathitem.id}}><a href="{% url 'editquiz' pathitem.id%}">{{pathitem.order}}. {{pathitem|verbose_name}}: {{pathitem.title}}</a>
 
-                         <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletequiz' pathitem.id %}';" class="btn btn-pill btn-outline-danger"><i class="far fa-trash-alt"></i></button>
-                        
-                        {%endif%}    
+                                <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletequiz' pathitem.id %}';" class="btn btn-pill btn-outline-danger"><i class="far fa-trash-alt"></i></button>
 
-                           
+                                {%endif%}
 
-                        </li>
+                            </li>
 
-                        {% endfor %}
+                            {% endfor %}
                     </ul>
 
                     <script src="https://unpkg.com/web-animations-js@2.3.1/web-animations.min.js"></script>
@@ -128,16 +121,6 @@
                 <div class="col-sm-4">
 
                     {% if section.id %}
-                    <ul class="list-group mt-4">
-                        {% for resource in section.resource_set.all %}
-                        <li class="list-group-item"><a target="_blank" href="{{resource.link.url}}">{{resource.name}}</a>
-
-                            <button style="float: right;" type="button" onclick="window.location.href='{% url 'deleteresource' resource.id %}';" class="btn btn-outline-danger"><i class="far fa-trash-alt"></i></button>
-
-                        </li>
-                        {% endfor %}
-
-                    </ul>
 
                     <br />
 
@@ -169,6 +152,19 @@
                     </div>
 
                     <button type="button" class="btn btn-danger btn-block" data-toggle="modal" data-target="#resourceModal" data-whatever="@getbootstrap"><i class="fas fa-plus"></i> Add Resource</button>
+
+                                        <ul class="list-group mt-4">
+                        {% for resource in section.resource_set.all %}
+                        <li class="list-group-item"><a target="_blank" href="{{resource.link.url}}">{{resource.name}}</a>
+
+                            <button style="float: right;" type="button" onclick="window.location.href='{% url 'deleteresource' resource.id %}';" class="btn btn-outline-danger"><i class="far fa-trash-alt"></i></button>
+
+                        </li>
+                        {% endfor %}
+
+                    </ul>
+
+                    <br />
 
                     {% endif %}
 

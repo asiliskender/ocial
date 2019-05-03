@@ -195,13 +195,13 @@ def editsection(request,section_id):
 				return redirect('editsection', section_id=section.id)
 			else:
 				return render(request, 'topics/editsection.html', {'section': section, 'error': 'Name field is required'})		
-		elif 'submit_section' in request.POST:
+		if 'submit_section' in request.POST:
 			if request.POST['sectionname']:
 				savesection(request,section)
 				return redirect('editcourse', course_id=section.course.id)
 			else:
 				return render(request, 'topics/editsection.html', {'section': section, 'error': 'Name field is required'})
-		elif 'addresource' in request.POST:
+		if 'addresource' in request.POST:
 			if request.FILES.get('resource', False) and request.POST['resourcename']:
 				resource = Resource()
 				resource.name = request.POST['resourcename']
@@ -211,7 +211,7 @@ def editsection(request,section_id):
 				return redirect('editsection', section_id=section.id)
 			else:
 				return render(request, 'topics/editsection.html', {'section': section, 'learningpath': learningpath, 'error': 'Resource and Resource Name fields are required'})
-		elif 'newlecture' in request.POST:
+		if 'newlecture' in request.POST:
 			if request.POST['itemtitle']:
 				lecture = Lecture()
 				lecture.title = request.POST['itemtitle']
@@ -219,7 +219,7 @@ def editsection(request,section_id):
 				lecture.order = len(learningpath)+1
 				lecture.save()
 				return redirect('editlecture', lecture_id=lecture.id)
-		elif 'newquiz' in request.POST:
+		if 'newquiz' in request.POST:
 			if request.POST['itemtitle']:
 				quiz = Quiz()
 				quiz.title = request.POST['itemtitle']
@@ -233,24 +233,14 @@ def editsection(request,section_id):
 
 def savesection(request,section):
 	
-	orderlp(request,section)
+	orderlp(request)
 
 	section.name = request.POST['sectionname']
 	section.description = request.POST['sectiondescription']
 	section.save()
 
-def editlecture(request, lecture_id):
-	lecture =  get_object_or_404(Lecture,pk=lecture_id)
-	return render(request, 'topics/editlecture.html',{'lecture': lecture})
-
-def editquiz(request, quiz_id):
-	quiz =  get_object_or_404(Quiz,pk=quiz_id)
-	return render(request, 'topics/editquiz.html',{'quiz': quiz})
-
-
-
 @login_required
-def orderlp(request,section):
+def orderlp(request):
 	if request.POST['lp-order']:
 		order_array = request.POST['lp-order']
 		order_array = order_array.split(',')
@@ -286,12 +276,96 @@ def deletesection(request,section_id):
 	section.delete()
 	return redirect('editcourse', course_id=course_id)
 
+
+@login_required
+def deleteresource(request,resource_id):
+	resource = get_object_or_404(Resource,pk=resource_id)
+	section_id = resource.section.id
+	resource.delete()
+	return redirect('editsection', section_id=section_id)
+
+
+def editlecture(request, lecture_id):
+	lecture =  get_object_or_404(Lecture,pk=lecture_id)
+	if request.method == 'POST':
+		if 'save_lecture' in request.POST:
+			if request.POST['lecturetitle']:
+				savelecture(request,lecture)
+				return redirect('editlecture', lecture_id=lecture.id)
+			else:
+				return render(request, 'topics/editlecture.html', {'lecture': lecture, 'error': 'Title field is required'})		
+		if 'submit_lecture' in request.POST:
+			if request.POST['lecturetitle']:
+				savelecture(request,lecture)
+				return redirect('editsection', section_id=lecture.section.id)
+			else:
+				return render(request, 'topics/editlecture.html', {'lecture': lecture, 'error': 'Title field is required'})		
+		return render(request, 'topics/editlecture.html',{'lecture': lecture})
+	else:
+		return render(request, 'topics/editlecture.html',{'lecture': lecture})
+
 @login_required
 def deletelecture(request,lecture_id):
 	lecture = get_object_or_404(Lecture,pk=lecture_id)
 	section_id = lecture.section.id
 	lecture.delete()
 	return redirect('editsection', section_id=section_id)
+
+def savelecture(request,lecture):
+	
+	lecture.title = request.POST['lecturetitle']
+	lecture.body = request.POST['lecturebody']
+	lecture.save()
+
+def editquiz(request, quiz_id):
+	quiz =  get_object_or_404(Quiz,pk=quiz_id)
+	if request.method == 'POST':
+			if 'save_quiz' in request.POST:
+				if request.POST['quiztitle']:
+					savequiz(request,quiz)
+					return redirect('editquiz', quiz_id=quiz.id)
+				else:
+					return render(request, 'topics/editquiz.html', {'quiz': quiz, 'error': 'Quiz title field is required'})		
+			if 'submit_quiz' in request.POST:
+				if request.POST['quiztitle']:
+					savequiz(request,quiz)
+					return redirect('editsection', section_id=quiz.section.id)
+				else:
+					return render(request, 'topics/editquiz.html', {'quiz': quiz, 'error': 'Quiz title field is required'})		
+			if 'newquestion' in request.POST:
+				if request.POST['questiontitle']:
+					numberofquestions = quiz.question_set.count()
+					question = Question()
+					question.title = request.POST['questiontitle']
+					question.quiz = quiz
+					question.order = numberofquestions+1
+					question.save()
+					return redirect('editquestion', question_id=question.id)
+			return render(request, 'topics/editquiz.html',{'quiz': quiz})
+	else:
+		return render(request, 'topics/editquiz.html',{'quiz': quiz})
+
+def savequiz(request,quiz):
+	
+	orderquestion(request)
+
+	quiz.title = request.POST['quiztitle']
+	quiz.successrate = request.POST['quizsuccessrate']
+	quiz.save()
+
+@login_required
+def orderquestion(request):
+	if request.POST['question-order']:
+		order_array = request.POST['question-order']
+		order_array = order_array.split(',')
+		print(order_array)
+
+		i = 1
+		for question_id in order_array:
+			question = get_object_or_404(Question,pk=question_id)
+			question.order = i
+			question.save()
+			i += 1
 
 @login_required
 def deletequiz(request,quiz_id):
@@ -300,10 +374,68 @@ def deletequiz(request,quiz_id):
 	quiz.delete()
 	return redirect('editsection', section_id=section_id)
 
+def editquestion(request, question_id):
+	question =  get_object_or_404(Question,pk=question_id)
+	if request.method == 'POST':
+			print(request.POST)
+
+			if 'save_question' in request.POST:
+				if request.POST['questiontitle']:
+					savequestion(request,question)
+					return redirect('editquestion', question_id=question.id)
+				else:
+					return render(request, 'topics/editquiz.html', {'quiz': quiz, 'error': 'Quiz title field is required'})		
+			if 'submit_question' in request.POST:
+				if request.POST['questiontitle']:
+					savequestion(request,question)
+					return redirect('editquiz', quiz_id=question.quiz.id)
+				else:
+					return render(request, 'topics/editquiz.html', {'quiz': quiz, 'error': 'Quiz title field is required'})		
+			if 'newchoice' in request.POST:
+				if request.POST['choicetitle']:
+					numberofchoices = question.choice_set.count()
+					choice = Choice()
+					choice.title = request.POST['choicetitle']
+					choice.question = question
+					choice.order = numberofchoices + 1
+					choice.save()
+					return redirect('editquestion', question_id=question.id)
+			return render(request, 'topics/editquestion.html',{'question': question})
+	else:
+		return render(request, 'topics/editquestion.html',{'question': question})
 
 @login_required
-def deleteresource(request,resource_id):
-	resource = get_object_or_404(Resource,pk=resource_id)
-	section_id = resource.section.id
-	resource.delete()
-	return redirect('editsection', section_id=section_id)
+def deletequestion(request,question_id):
+	question = get_object_or_404(Question,pk=question_id)
+	quiz_id = question.quiz.id
+	question.delete()
+	return redirect('editquiz', quiz_id=quiz_id)
+
+@login_required
+def savequestion(request,question):
+	
+	orderchoice(request)
+
+	question.title = request.POST['questiontitle']
+	question.save()
+
+@login_required
+def orderchoice(request):
+	if request.POST['choice-order']:
+		order_array = request.POST['choice-order']
+		order_array = order_array.split(',')
+		print(order_array)
+
+		i = 1
+		for choice_id in order_array:
+			choice = get_object_or_404(Choice,pk=choice_id)
+			choice.order = i
+			choice.save()
+			i += 1
+
+@login_required
+def deletechoice(request,choice_id):
+	choice = get_object_or_404(Choice,pk=choice_id)
+	question_id = choice.question.id
+	choice.delete()
+	return redirect('editquestion', question_id=question_id)

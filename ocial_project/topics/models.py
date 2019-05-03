@@ -81,10 +81,38 @@ class Quiz(models.Model):
 	title = models.CharField(max_length=200)
 	section = models.ForeignKey('Section', on_delete=models.CASCADE)
 	order =  models.IntegerField(default=1)
+	successrate =  models.IntegerField(default=0)
+
 
 	class Meta:
 		ordering = ['order']
 		verbose_name = 'Quiz'
+
+	def __str__(self):
+		return self.title
+
+class Question(models.Model):
+	title = models.TextField(blank=True)
+	quiz = models.ForeignKey('Quiz', on_delete=models.CASCADE)
+	order =  models.IntegerField(default=1)
+
+	class Meta:
+		ordering = ['order']
+		verbose_name = 'Question'
+
+	def __str__(self):
+		return self.title
+
+class Choice(models.Model):
+	title = models.TextField(blank=True)
+	question = models.ForeignKey('Question', on_delete=models.CASCADE)
+	order =  models.IntegerField(default=1)
+	isTrue = models.BooleanField(default=False)
+
+
+	class Meta:
+		ordering = ['order']
+		verbose_name = 'Choice'
 
 	def __str__(self):
 		return self.title
