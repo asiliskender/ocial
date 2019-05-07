@@ -377,8 +377,6 @@ def deletequiz(request,quiz_id):
 def editquestion(request, question_id):
 	question =  get_object_or_404(Question,pk=question_id)
 	if request.method == 'POST':
-			print(request.POST)
-
 			if 'save_question' in request.POST:
 				if request.POST['questiontitle']:
 					savequestion(request,question)
@@ -400,6 +398,13 @@ def editquestion(request, question_id):
 					choice.order = numberofchoices + 1
 					choice.save()
 					return redirect('editquestion', question_id=question.id)
+			elif 'choicetitleedit' in request.POST:
+				if request.POST['edit_choicetitle']:
+					choice_id = request.POST['edit_choiceid']
+					choice = get_object_or_404(Choice,pk=choice_id)
+					choice.title = request.POST['edit_choicetitle']
+					choice.save()
+				return redirect('editquestion', question_id=question.id)
 			return render(request, 'topics/editquestion.html',{'question': question})
 	else:
 		return render(request, 'topics/editquestion.html',{'question': question})
@@ -424,12 +429,22 @@ def orderchoice(request):
 	if request.POST['choice-order']:
 		order_array = request.POST['choice-order']
 		order_array = order_array.split(',')
-		print(order_array)
+
+		print(request.POST)
+
+		if 'choice-radio' in request.POST:
+			trueChoice = request.POST['choice-radio']
+		else:
+			trueChoice = -1
 
 		i = 1
 		for choice_id in order_array:
 			choice = get_object_or_404(Choice,pk=choice_id)
 			choice.order = i
+			if choice_id == trueChoice:
+				choice.isTrue = True
+			else:
+				choice.isTrue = False
 			choice.save()
 			i += 1
 

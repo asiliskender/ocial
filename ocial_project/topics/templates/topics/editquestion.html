@@ -62,12 +62,13 @@
                 <div class="col-sm-8">
 
                     {% if question.id %}<small>Question: {{question.quiz}}</small>{% endif %}
-                    <textarea type="text" class="form-control" name="questiontitle" placeholder="Quiz Title" rows=4 >{{ question.title }}</textarea>
+                    <textarea type="text" class="form-control" name="questiontitle" placeholder="Quiz Title" rows=4>{{ question.title }}</textarea>
 
                     <input type="hidden" name="choice-order" id="choice-order">
 
                     <ul class="list-group mt-4" id="demo2">
-                        <div class="modal fade" id="choiceAddModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+
+                        <div class="modal fade" id="choiceAddModal" tabindex="-1" role="dialog" aria-labelledby="choiceAddModalLabel" aria-hidden="true">
                             <div class="modal-dialog" role="document">
                                 <div class="modal-content">
                                     <div class="modal-header">
@@ -79,7 +80,7 @@
                                     <div class="modal-body">
                                         <form>
                                             <div class="form-group">
-                                                <textarea type="text" class="form-control" name="choicetitle" placeholder="Answer" rows= 4></textarea> 
+                                                <textarea type="text" class="form-control" name="choicetitle" placeholder="Answer" rows=4></textarea>
                                             </div>
                                         </form>
                                     </div>
@@ -91,10 +92,10 @@
                             </div>
                         </div>
 
-                        <button type="button" class="btn btn-danger btn-block" data-toggle="modal" data-target="#choiceAddModal" data-whatever="@getbootstrap"><i class="fas fa-check"></i> New Answer</button>
+                        <button type="button" class="btn btn-danger btn-block" data-toggle="modal" data-target="#choiceAddModal"><i class="fas fa-check"></i> New Answer</button>
 
+                        <div class="modal fade" id="choiceEditModal" tabindex="-1" role="dialog" aria-labelledby="choiceEditModalLabel" aria-hidden="true">
 
-                        <div class="modal fade" id="choiceEditModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                             <div class="modal-dialog" role="document">
                                 <div class="modal-content">
                                     <div class="modal-header">
@@ -104,47 +105,50 @@
                                         </button>
                                     </div>
                                     <div class="modal-body">
-                                        <form>
                                             <div class="form-group">
-                                                <textarea type="text" class="form-control" name="choicetitle" placeholder="Answer" rows= 4></textarea> 
+                                                <input type="hidden" class="form-control" name="edit_choiceid">
+                                                <textarea type="text" class="form-control" name="edit_choicetitle" placeholder="Answer" rows=4></textarea>
                                             </div>
-                                        </form>
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                        <button type="submit" name="editchoice" class="btn btn-danger"><i class="fas fa-check"></i> Edit Answer</button>
+                                        <button type="submit" class="btn btn-danger" name="choicetitleedit">Edit Answer</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
+                        <script type="text/javascript">
+                            $('#choiceEditModal').on('show.bs.modal', function(event) {
+                                var button = $(event.relatedTarget) // Button that triggered the modal
+                                var choice_title = button.data('whatever')
+                                var choice_id = button.data('id')
+
+                                var modal = $(this)
+                                modal.find('.modal-body textarea').val(choice_title)
+                                modal.find('.modal-body input').val(choice_id)
+
+                            })
+                        </script>
+
                         <ul class="grid">
 
                             {% for choice in question.choice_set.all %}
-                            <li class="item" data-id={{choice.id}}><input type="radio" name= "optradio" id="check:{{choice.id}}"> <a data-toggle="modal" href="#choiceEditModal">{{choice.title}}</a>
+                            <li class="item" data-id={{choice.id}}>
+                                <input type="radio" name="choice-radio" value="{{choice.id}}" 
+                                {%if choice.isTrue == True%} checked="checked" {%endif%}> {{choice.title}}
 
                                 <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletechoice' choice.id %}';" class="btn btn-pill btn-outline-danger"><i class="far fa-trash-alt"></i></button>
 
-                            </li>
+                                <button style="float: right;" type="button" class="btn btn-danger" data-toggle="modal" data-target="#choiceEditModal" data-id="{{choice.id}}" data-whatever="{{choice.title}}"><i class="fas fa-edit"></i></button>
 
+                                
+
+                            </li>
 
                             {% endfor %}
                         </ul>
                     </ul>
-
-                    <script type="text/javascript">
-    
-$('#choiceEditModal').on('show.bs.modal', function(e) {
-
-    //get data-id attribute of the clicked element
-    var choiceID = $(e.relatedTarget).data('id');
-
-    //populate the textbox
-    $(e.currentTarget).find('input[name="choicetitle"]').val(choiceID);
-});
-
-
-</script>
 
                 </div>
 
@@ -153,20 +157,19 @@ $('#choiceEditModal').on('show.bs.modal', function(e) {
                     <br />
                     <div class="form-inline">
 
+                        <button type="submit" name="save_question" id="save_question" class="btn btn-danger btn-block"><i class="far fa-save"></i> Save</button>
 
-                    <button type="submit" name="save_question" id="save_question" class="btn btn-danger btn-block"><i class="far fa-save"></i> Save</button>
+                        {% if question.id %}
+                        <button type="submit" name="submit_question" id="submit_question" class="btn btn-danger btn-block">Submit</button>
 
-                    {% if question.id %}
-                    <button type="submit" name="submit_question" id="submit_question" class="btn btn-danger btn-block">Submit</button>
+                        <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletequestion' question.id %}';" class="btn btn-block btn-outline-danger" style="margin-bottom: 5px;"><i class="far fa-trash-alt"></i> Delete Question</button>
 
-                    <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletequestion' question.id %}';" class="btn btn-block btn-outline-danger" style="margin-bottom: 5px;"><i class="far fa-trash-alt"></i> Delete Question</button>
+                        {% endif %}
 
-                    {% endif %}
-
+                    </div>
                 </div>
-            </div>
 
-        </div>
+            </div>
 
     </form>
 
@@ -192,6 +195,6 @@ $('#choiceEditModal').on('show.bs.modal', function(e) {
         }
     </script>
 
-</div>
+    </div>
 
-{%endblock%}
+    {%endblock%}
