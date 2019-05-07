@@ -123,7 +123,8 @@ def editcourse(request,course_id):
 		return render(request, 'topics/editcourse.html',{'topics': topics ,'course': course},)
 
 def savecourse(request,course):
-	ordersection(request)
+	if 'section-order' in request.POST:
+		ordersection(request)
 
 	course.title = request.POST['title']
 	course.description = request.POST['description']
@@ -233,7 +234,8 @@ def editsection(request,section_id):
 
 def savesection(request,section):
 	
-	orderlp(request)
+	if 'lp-order' in request.POST:
+		orderlp(request)
 
 	section.name = request.POST['sectionname']
 	section.description = request.POST['sectiondescription']
