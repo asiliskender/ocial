@@ -7,7 +7,7 @@
             <div class="col-md-4">
                 <div class="card mb-4 shadow-sm">
                     <div class="card-body">
-                        <a href="{%url 'explore'%}?search_topic={{topic.id}}" class="card-text">{{ topic.title }}</a>
+                        <a href="{%url 'exploretopic' topic.id %}" class="card-text">{{ topic.title }}</a>
                         <div class="d-flex justify-content-between align-items-center">
                             <small class="text-muted">{{topic.number_of_courses}}  courses</small>
                         </div>

@@ -11,6 +11,7 @@ urlpatterns = [
     path('classroom/', include('topics.urls')),
     path('topics',views.topics, name= 'topics'),
     path('explore',views.explore, name= 'explore'),
+    path('explore/<int:topic_id>',views.exploretopic, name= 'exploretopic'),
     path('course/<int:course_id>/', views.coursedetail, name = 'coursedetail'),
     
 

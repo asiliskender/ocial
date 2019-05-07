@@ -42,8 +42,20 @@ def explore(request):
 		else:
 			courses = Course.objects.filter(published=True)
 			#courses = sorted(courses,reverse=True)
-		
 		return render(request, 'topics/explore.html', {'courses': courses})
+
+def exploretopic(request,topic_id):
+	topic =  get_object_or_404(Topic,pk=topic_id) 
+
+	if request.method == 'GET': # If the form is submitted
+		search_query = request.GET.get('search_course', None)
+
+		if search_query != None:
+			courses = Course.objects.filter(topic= topic_id,title__icontains=search_query, published=True)
+		else:
+			courses = Course.objects.filter(topic= topic_id,published=True)
+			#courses = sorted(courses,reverse=True)
+		return render(request, 'topics/explore.html', {'courses': courses,'topic': topic})
 
 def coursedetail(request, course_id):
 	course =  get_object_or_404(Course,pk=course_id, published=True)
