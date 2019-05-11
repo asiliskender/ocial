@@ -43,8 +43,9 @@ class Label(models.Model):
 
 class Glossary(models.Model):
 	name = models.CharField(max_length=200)
-	image = models.ImageField(upload_to='images/', blank=True)
+	image_url = models.CharField(max_length=1000, blank=True)
 	description = models.TextField(blank=True)
+	url = models.CharField(max_length=1000, blank=True)
 	course = models.ForeignKey('Course', on_delete=models.CASCADE)
 
 

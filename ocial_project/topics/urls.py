@@ -20,6 +20,9 @@ urlpatterns = [
     path('deletequiz/<int:quiz_id>/', views.deletequiz, name = 'deletequiz'),
     path('deletequestion/<int:question_id>/', views.deletequestion, name = 'deletequestion'),
     path('deletechoice/<int:choice_id>/', views.deletechoice, name = 'deletechoice'),
+    path('deleteglossary/<int:glossary_id>/', views.deleteglossary, name = 'deleteglossary'),
+    path('newglossary/<int:course_id>/<str:wiki_id>', views.newglossary, name = 'newglossary'),
+
 
 
 ]

@@ -6,8 +6,11 @@ from django.db.models import Count
 import operator
 import requests
 import json
-from wikidata.client import Client
+import hashlib
 from itertools import chain
+from django.core.files import File
+from django.core.files.base import ContentFile
+
 
 
 
@@ -33,12 +36,9 @@ def topics(request):
 def explore(request):
 	if request.method == 'GET': # If the form is submitted
 		search_query = request.GET.get('search_course', None)
-		search_query_topic = request.GET.get('search_topic', None)
 
 		if search_query != None:
 			courses = Course.objects.filter(title__icontains=search_query, published=True)
-		elif search_query_topic != None:
-			courses = Course.objects.filter(topic=search_query_topic, published=True)
 		else:
 			courses = Course.objects.filter(published=True)
 			#courses = sorted(courses,reverse=True)
@@ -56,6 +56,19 @@ def exploretopic(request,topic_id):
 			courses = Course.objects.filter(topic= topic_id,published=True)
 			#courses = sorted(courses,reverse=True)
 		return render(request, 'topics/explore.html', {'courses': courses,'topic': topic})
+
+def exploreteacher(request,id):
+	teacher =  get_object_or_404(User,pk=id) 
+
+	if request.method == 'GET': # If the form is submitted
+		search_query = request.GET.get('search_course', None)
+
+		if search_query != None:
+			courses = Course.objects.filter(teacher= id,title__icontains=search_query, published=True)
+		else:
+			courses = Course.objects.filter(teacher= id,published=True)
+			#courses = sorted(courses,reverse=True)
+		return render(request, 'topics/explore.html', {'courses': courses,'teacher': teacher})
 
 def coursedetail(request, course_id):
 	course =  get_object_or_404(Course,pk=course_id, published=True)
@@ -165,7 +178,72 @@ def savecourse(request,course):
 @login_required
 def glossary(request, course_id):
 	course =  get_object_or_404(Course,pk=course_id)
-	return render(request, 'topics/glossary.html',{'course': course})
+
+	if 'search_glossary' in request.POST:
+		API_ENDPOINT = "https://www.wikidata.org/w/api.php"
+		query =  request.POST['search_glossary']
+		params = {
+		    'action': 'wbsearchentities',
+		    'format': 'json',
+		    'language': 'en',
+		    'limit': '20',
+		    'search': query
+		}
+		wiki_request = requests.get(API_ENDPOINT, params = params)
+		r_json = wiki_request.json()['search']
+		r_json = json.dumps(r_json)
+		r_json = json.loads(r_json)
+		return render(request, 'topics/glossary.html',{'course': course, 'r_json': r_json})
+	else:
+		return render(request, 'topics/glossary.html',{'course': course})
+
+def newglossary(request,course_id,wiki_id):
+	glossary = Glossary()
+	course =  get_object_or_404(Course,pk=course_id)
+
+
+	API_ENDPOINT = "https://www.wikidata.org/w/api.php"
+	query =  wiki_id
+	params = {
+		    'action': 'wbsearchentities',
+		    'format': 'json',
+		    'language': 'en',
+		    'limit': '1',
+		    'search': query
+		}
+	wiki_request = requests.get(API_ENDPOINT, params = params)
+	r_json = wiki_request.json()['search']
+	r_json = json.dumps(r_json)
+	r_json = json.loads(r_json)
+	
+	for entity in r_json:
+		glossary.name = entity['label']
+		glossary.description = entity['description']
+		glossary.url = "https:" + entity['url']
+
+	try:
+		URL = "https://www.wikidata.org/w/api.php?action=wbgetclaims&entity={}&format=json".format(wiki_id)
+		R = requests.get(URL).json()
+		image_name= R['claims']['P18'][0]['mainsnak']['datavalue']['value']
+		image_name = image_name.replace(' ', '_')
+		md5sum = hashlib.md5(image_name.encode('utf-8')).hexdigest()
+		a = md5sum[:1]
+		ab = md5sum[:2]
+		image_URL = "https://upload.wikimedia.org/wikipedia/commons/{}/{}/{}".format(a,ab,image_name)
+		glossary.image_url = image_URL
+	except:
+		pass
+
+	glossary.course = course
+	glossary.save()
+	return redirect('glossary', course_id=course.id)
+
+@login_required
+def deleteglossary(request,glossary_id):
+	glossary =  get_object_or_404(Glossary,pk=glossary_id)
+	course = glossary.course
+	glossary.delete()
+	return redirect('glossary', course_id=course.id)
 
 
 @login_required
