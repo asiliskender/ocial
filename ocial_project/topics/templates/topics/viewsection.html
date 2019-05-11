@@ -1,0 +1,32 @@
+{% extends '../temp/classroom_base.html' %} {% load static %} {% load my_tags %} {% block content %}
+
+
+
+{{section.name}}
+
+
+
+
+<ul class="list-group">
+	{% for pathitem in learningpath %}
+
+  <li class="list-group-item">{{pathitem.order}}. {{pathitem|verbose_name}}: {{pathitem.title}}</li>
+{% endfor %}
+
+</ul>
+
+<ul class="list-group">
+
+{% for resource in section.resource_set.all %}
+                        <li class="list-group-item"><a target="_blank" href="{{resource.link.url}}">{{resource.name}}</a></li>
+{% endfor %}
+
+
+</ul>
+
+
+
+
+
+
+{%endblock%}

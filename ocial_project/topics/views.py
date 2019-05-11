@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from .models import *
+from accounts.models import *
 from django.db.models import Count
 import operator
 import requests
@@ -10,6 +11,8 @@ import hashlib
 from itertools import chain
 from django.core.files import File
 from django.core.files.base import ContentFile
+from .decorators import *
+
 
 
 
@@ -57,6 +60,20 @@ def exploretopic(request,topic_id):
 			#courses = sorted(courses,reverse=True)
 		return render(request, 'topics/explore.html', {'courses': courses,'topic': topic})
 
+
+def explorelabel(request,label_id):
+	label =  get_object_or_404(Label,pk=label_id) 
+
+	if request.method == 'GET': # If the form is submitted
+		search_query = request.GET.get('search_label', None)
+
+		if search_query != None:
+			courses = Course.objects.filter(label= label_id,title__icontains=search_query, published=True)
+		else:
+			courses = Course.objects.filter(label= label_id,published=True)
+			#courses = sorted(courses,reverse=True)
+		return render(request, 'topics/explore.html', {'courses': courses,'label': label})
+
 def exploreteacher(request,id):
 	teacher =  get_object_or_404(User,pk=id) 
 
@@ -70,9 +87,16 @@ def exploreteacher(request,id):
 			#courses = sorted(courses,reverse=True)
 		return render(request, 'topics/explore.html', {'courses': courses,'teacher': teacher})
 
+
+
 def coursedetail(request, course_id):
 	course =  get_object_or_404(Course,pk=course_id, published=True)
-	return render(request, 'topics/course_detail.html', {'course': course})
+	learners_query = list(Learner.objects.filter(course = course))
+	learners = list()
+
+	for learner in learners_query:
+		learners.append(learner.user.username)
+	return render(request, 'topics/course_detail.html', {'learners':learners,'course': course})
 
 
 
@@ -83,8 +107,9 @@ def classroom(request):
 
 @login_required
 def teacher(request):
-	courses = Course.objects.filter(teacher=request.user)
-	return render(request, 'topics/teacher.html',{'courses': courses })
+	teacher = request.user
+	courses = Course.objects.filter(teacher=teacher)
+	return render(request, 'topics/teacher.html',{'courses': courses , 'teacher': teacher})
 
 
 @login_required
@@ -106,9 +131,11 @@ def newcourse(request):
 		return render(request, 'topics/newcourse.html',{'topics': topics})
 		
 @login_required
+@course_teacher_is_user
 def editcourse(request,course_id):
 	course =  get_object_or_404(Course,pk=course_id) 
 	topics = Topic.objects.all()
+	teacher = course.teacher
 	if request.method == 'POST':
 		if 'addglossary' in request.POST:
 			return redirect('glossary', course_id=course.id)
@@ -133,7 +160,7 @@ def editcourse(request,course_id):
 				savecourse(request,course)
 				return redirect('editcourse', course_id=course.id)
 			else:
-				return render(request, 'topics/editcourse.html', {'topics': topics , 'course': course, 'error': 'Title and Topic fields are required'})
+				return render(request, 'topics/editcourse.html', {'teacher':teacher,'topics': topics , 'course': course, 'error': 'Title and Topic fields are required'})
 		
 		if 'publish' in request.POST:
 			if request.POST['title'] and request.POST.getlist('topic'):
@@ -143,9 +170,9 @@ def editcourse(request,course_id):
 				return redirect('teacher')
 			else:
 				return render(request, 'topics/editcourse.html', {'topics': topics , 'course': course, 'error': 'Title and Topic fields are required'})	
-		return render(request, 'topics/editcourse.html',{'topics': topics ,'course': course},)
+		return render(request, 'topics/editcourse.html',{'teacher':teacher,'topics': topics ,'course': course},)
 	else:
-		return render(request, 'topics/editcourse.html',{'topics': topics ,'course': course},)
+		return render(request, 'topics/editcourse.html',{'teacher':teacher,'topics': topics ,'course': course},)
 
 def savecourse(request,course):
 	if 'section-order' in request.POST:
@@ -176,26 +203,35 @@ def savecourse(request,course):
 			course.label.add(newlabel)
 
 @login_required
+@course_teacher_is_user
 def glossary(request, course_id):
 	course =  get_object_or_404(Course,pk=course_id)
+	teacher = course.teacher
+
+	print(request.POST)
 
 	if 'search_glossary' in request.POST:
-		API_ENDPOINT = "https://www.wikidata.org/w/api.php"
-		query =  request.POST['search_glossary']
-		params = {
-		    'action': 'wbsearchentities',
-		    'format': 'json',
-		    'language': 'en',
-		    'limit': '20',
-		    'search': query
-		}
-		wiki_request = requests.get(API_ENDPOINT, params = params)
-		r_json = wiki_request.json()['search']
-		r_json = json.dumps(r_json)
-		r_json = json.loads(r_json)
-		return render(request, 'topics/glossary.html',{'course': course, 'r_json': r_json})
+		if request.POST['search_glossary']:
+			API_ENDPOINT = "https://www.wikidata.org/w/api.php"
+			query =  request.POST['search_glossary']
+			params = {
+			    'action': 'wbsearchentities',
+			    'format': 'json',
+			    'language': 'en',
+			    'limit': '20',
+			    'search': query
+			}
+			wiki_request = requests.get(API_ENDPOINT, params = params)
+			r_json = wiki_request.json()['search']
+			r_json = json.dumps(r_json)
+			r_json = json.loads(r_json)
+			return render(request, 'topics/glossary.html',{'teacher':teacher,'course': course, 'r_json': r_json})
+		else:
+			return render(request, 'topics/glossary.html',{'teacher':teacher,'course': course})
 	else:
-		return render(request, 'topics/glossary.html',{'course': course})
+		return render(request, 'topics/glossary.html',{'teacher':teacher,'course': course})
+
+
 
 def newglossary(request,course_id,wiki_id):
 	glossary = Glossary()
@@ -239,6 +275,7 @@ def newglossary(request,course_id,wiki_id):
 	return redirect('glossary', course_id=course.id)
 
 @login_required
+@glossary_teacher_is_user
 def deleteglossary(request,glossary_id):
 	glossary =  get_object_or_404(Glossary,pk=glossary_id)
 	course = glossary.course
@@ -247,12 +284,14 @@ def deleteglossary(request,glossary_id):
 
 
 @login_required
+@course_teacher_is_user
 def deletecourse(request,course_id):
 	course =  get_object_or_404(Course,pk=course_id)
 	course.delete()
 	return redirect('teacher')
 
 @login_required
+@course_teacher_is_user
 def deletelabel(request,label_id, course_id):
 	label = get_object_or_404(Label,pk=label_id)
 	course =  get_object_or_404(Course,pk=course_id)
@@ -275,9 +314,12 @@ def ordersection(request):
 			i += 1
 
 @login_required
+@section_teacher_is_user
 def editsection(request,section_id):
 	section =  get_object_or_404(Section,pk=section_id)
 	learningpath = getlearningpath(section_id)
+	teacher = section.course.teacher
+
 
 	if request.method == 'POST':
 		if 'save_section' in request.POST:
@@ -285,13 +327,13 @@ def editsection(request,section_id):
 				savesection(request,section)
 				return redirect('editsection', section_id=section.id)
 			else:
-				return render(request, 'topics/editsection.html', {'section': section, 'error': 'Name field is required'})		
+				return render(request, 'topics/editsection.html', {'teacher':teacher,'section': section, 'error': 'Name field is required'})		
 		if 'submit_section' in request.POST:
 			if request.POST['sectionname']:
 				savesection(request,section)
 				return redirect('editcourse', course_id=section.course.id)
 			else:
-				return render(request, 'topics/editsection.html', {'section': section, 'error': 'Name field is required'})
+				return render(request, 'topics/editsection.html', {'teacher':teacher,'section': section, 'error': 'Name field is required'})
 		if 'addresource' in request.POST:
 			if request.FILES.get('resource', False) and request.POST['resourcename']:
 				resource = Resource()
@@ -301,7 +343,7 @@ def editsection(request,section_id):
 				resource.save()
 				return redirect('editsection', section_id=section.id)
 			else:
-				return render(request, 'topics/editsection.html', {'section': section, 'learningpath': learningpath, 'error': 'Resource and Resource Name fields are required'})
+				return render(request, 'topics/editsection.html', {'teacher':teacher,'section': section, 'learningpath': learningpath, 'error': 'Resource and Resource Name fields are required'})
 		if 'newlecture' in request.POST:
 			if request.POST['itemtitle']:
 				lecture = Lecture()
@@ -318,9 +360,10 @@ def editsection(request,section_id):
 				quiz.order = len(learningpath)+1
 				quiz.save()
 				return redirect('editquiz', quiz_id=quiz.id)
-		return render(request, 'topics/editsection.html',{'section': section, 'learningpath': learningpath})
+		return render(request, 'topics/editsection.html',{'teacher':teacher,'section': section, 'learningpath': learningpath})
 	else:
-		return render(request, 'topics/editsection.html',{'section': section, 'learningpath': learningpath})
+		return render(request, 'topics/editsection.html',{'teacher':teacher,'section': section, 'learningpath': learningpath})
+
 
 def savesection(request,section):
 	
@@ -352,7 +395,6 @@ def orderlp(request):
 				quiz.save()
 			i += 1
 
-
 def getlearningpath(section_id):
     lectures = Lecture.objects.filter(section= section_id)
     quizs = Quiz.objects.filter(section= section_id)
@@ -362,6 +404,7 @@ def getlearningpath(section_id):
     return learningpath
 
 @login_required
+@section_teacher_is_user
 def deletesection(request,section_id):
 	section = get_object_or_404(Section,pk=section_id)
 	course_id = section.course.id
@@ -376,27 +419,31 @@ def deleteresource(request,resource_id):
 	resource.delete()
 	return redirect('editsection', section_id=section_id)
 
-
+@login_required
+@lecture_teacher_is_user
 def editlecture(request, lecture_id):
 	lecture =  get_object_or_404(Lecture,pk=lecture_id)
+	teacher = lecture.section.course.teacher
+
 	if request.method == 'POST':
 		if 'save_lecture' in request.POST:
 			if request.POST['lecturetitle']:
 				savelecture(request,lecture)
 				return redirect('editlecture', lecture_id=lecture.id)
 			else:
-				return render(request, 'topics/editlecture.html', {'lecture': lecture, 'error': 'Title field is required'})		
+				return render(request, 'topics/editlecture.html', {'teacher':teacher,'lecture': lecture, 'error': 'Title field is required'})		
 		if 'submit_lecture' in request.POST:
 			if request.POST['lecturetitle']:
 				savelecture(request,lecture)
 				return redirect('editsection', section_id=lecture.section.id)
 			else:
-				return render(request, 'topics/editlecture.html', {'lecture': lecture, 'error': 'Title field is required'})		
-		return render(request, 'topics/editlecture.html',{'lecture': lecture})
+				return render(request, 'topics/editlecture.html', {'teacher':teacher,'lecture': lecture, 'error': 'Title field is required'})		
+		return render(request, 'topics/editlecture.html',{'teacher':teacher,'lecture': lecture})
 	else:
-		return render(request, 'topics/editlecture.html',{'lecture': lecture})
+		return render(request, 'topics/editlecture.html',{'teacher':teacher,'lecture': lecture})
 
 @login_required
+@lecture_teacher_is_user
 def deletelecture(request,lecture_id):
 	lecture = get_object_or_404(Lecture,pk=lecture_id)
 	section_id = lecture.section.id
@@ -409,21 +456,25 @@ def savelecture(request,lecture):
 	lecture.body = request.POST['lecturebody']
 	lecture.save()
 
+@login_required
+@quiz_teacher_is_user
 def editquiz(request, quiz_id):
 	quiz =  get_object_or_404(Quiz,pk=quiz_id)
+	teacher = quiz.section.course.teacher
+
 	if request.method == 'POST':
 			if 'save_quiz' in request.POST:
 				if request.POST['quiztitle']:
 					savequiz(request,quiz)
 					return redirect('editquiz', quiz_id=quiz.id)
 				else:
-					return render(request, 'topics/editquiz.html', {'quiz': quiz, 'error': 'Quiz title field is required'})		
+					return render(request, 'topics/editquiz.html', {'teacher':teacher,'quiz': quiz, 'error': 'Quiz title field is required'})		
 			if 'submit_quiz' in request.POST:
 				if request.POST['quiztitle']:
 					savequiz(request,quiz)
 					return redirect('editsection', section_id=quiz.section.id)
 				else:
-					return render(request, 'topics/editquiz.html', {'quiz': quiz, 'error': 'Quiz title field is required'})		
+					return render(request, 'topics/editquiz.html', {'teacher':teacher,'quiz': quiz, 'error': 'Quiz title field is required'})		
 			if 'newquestion' in request.POST:
 				if request.POST['questiontitle']:
 					numberofquestions = quiz.question_set.count()
@@ -433,9 +484,9 @@ def editquiz(request, quiz_id):
 					question.order = numberofquestions+1
 					question.save()
 					return redirect('editquestion', question_id=question.id)
-			return render(request, 'topics/editquiz.html',{'quiz': quiz})
+			return render(request, 'topics/editquiz.html',{'teacher':teacher,'quiz': quiz})
 	else:
-		return render(request, 'topics/editquiz.html',{'quiz': quiz})
+		return render(request, 'topics/editquiz.html',{'teacher':teacher,'quiz': quiz})
 
 def savequiz(request,quiz):
 	
@@ -460,27 +511,32 @@ def orderquestion(request):
 			i += 1
 
 @login_required
+@quiz_teacher_is_user
 def deletequiz(request,quiz_id):
 	quiz = get_object_or_404(Quiz,pk=quiz_id)
 	section_id = quiz.section.id
 	quiz.delete()
 	return redirect('editsection', section_id=section_id)
 
+@login_required
+@question_teacher_is_user
 def editquestion(request, question_id):
 	question =  get_object_or_404(Question,pk=question_id)
+	teacher = question.quiz.section.course.teacher
+
 	if request.method == 'POST':
 			if 'save_question' in request.POST:
 				if request.POST['questiontitle']:
 					savequestion(request,question)
 					return redirect('editquestion', question_id=question.id)
 				else:
-					return render(request, 'topics/editquiz.html', {'quiz': quiz, 'error': 'Quiz title field is required'})		
+					return render(request, 'topics/editquiz.html', {'teacher':teacher,'quiz': quiz, 'error': 'Quiz title field is required'})		
 			if 'submit_question' in request.POST:
 				if request.POST['questiontitle']:
 					savequestion(request,question)
 					return redirect('editquiz', quiz_id=question.quiz.id)
 				else:
-					return render(request, 'topics/editquiz.html', {'quiz': quiz, 'error': 'Quiz title field is required'})		
+					return render(request, 'topics/editquiz.html', {'teacher':teacher,'quiz': quiz, 'error': 'Quiz title field is required'})		
 			if 'newchoice' in request.POST:
 				if request.POST['choicetitle']:
 					numberofchoices = question.choice_set.count()
@@ -497,11 +553,12 @@ def editquestion(request, question_id):
 					choice.title = request.POST['edit_choicetitle']
 					choice.save()
 				return redirect('editquestion', question_id=question.id)
-			return render(request, 'topics/editquestion.html',{'question': question})
+			return render(request, 'topics/editquestion.html',{'teacher':teacher,'question': question})
 	else:
-		return render(request, 'topics/editquestion.html',{'question': question})
+		return render(request, 'topics/editquestion.html',{'teacher':teacher,'question': question})
 
 @login_required
+@question_teacher_is_user
 def deletequestion(request,question_id):
 	question = get_object_or_404(Question,pk=question_id)
 	quiz_id = question.quiz.id
@@ -541,8 +598,54 @@ def orderchoice(request):
 			i += 1
 
 @login_required
+@question_teacher_is_user
 def deletechoice(request,choice_id):
 	choice = get_object_or_404(Choice,pk=choice_id)
 	question_id = choice.question.id
 	choice.delete()
 	return redirect('editquestion', question_id=question_id)
+
+
+@login_required
+def enrollcourse(request,course_id):
+	course =  get_object_or_404(Course,pk=course_id, published=True)
+	learner, created = Learner.objects.get_or_create(user=request.user)
+	learner.save()
+	learner.course.add(course)
+	return redirect('viewcourse', course_id=course_id)
+
+@login_required
+def learner(request):
+	learner, created = Learner.objects.get_or_create(user=request.user)
+	return render(request, 'topics/learner.html',{'learner': learner })
+
+@login_required
+def viewcourse(request,course_id):
+	course =  get_object_or_404(Course,pk=course_id, published=True)
+	learner = Learner.objects.filter(course= course, user= request.user)
+	return render(request, 'topics/viewcourse.html',{'learner':learner,'course': course })
+
+@login_required
+def viewglossary(request,course_id):
+	course =  get_object_or_404(Course,pk=course_id, published=True)
+	learner = Learner.objects.filter(course= course, user= request.user)
+	return render(request, 'topics/viewglossary.html',{'learner':learner,'course': course })
+
+@login_required
+def viewsection(request,section_id):
+	section =  get_object_or_404(Section,pk=section_id)
+	learner = Learner.objects.filter(course= section.course, user= request.user)
+
+	lectures = Lecture.objects.filter(section= section_id)
+	quizes = Quiz.objects.filter(section=section_id)
+
+	learningpath = list()
+
+	for lecture in lectures:
+		learningpath.append(lecture)
+	for quiz in quizes:
+		learningpath.append(quiz)
+
+	learningpath.sort(key=lambda x: x.order, reverse=False)
+	return render(request, 'topics/viewsection.html',{'learner':learner,'section': section, 'learningpath':learningpath})
+

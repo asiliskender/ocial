@@ -24,13 +24,20 @@
             <h2>Glossary</h2>
             <p>{{course.title}}</p>
 
-            <input class="form-control" type="text" placeholder="Search" name="search_glossary">
+            <div class="row">
+                <div class="col-md-10">
+                    <input class="form-control" type="text" placeholder="Search" name="search_glossary">
+                </div>
+
+                <div class="col-md-2">
+                    <a href="{% url 'editcourse' course.id %}" class="btn btn-danger btn-block" >Submit</a>
+                </div>
+            </div>
 
             <ul class="list-group mt-4" id="demo2">
 
-                {% for glossary in glossaries %}
-                <li class="list-group-item"><a href="{% url 'editsection' section.id %}">{{glossary.name}}</a></li>
-                {% endfor %} {%if r_json %} {% for glossary in r_json %}
+                {%if r_json %} 
+                {% for glossary in r_json %}
 
                 <div class="list-group">
                     <p class="list-group-item clearfix" style="margin-bottom:5px;">

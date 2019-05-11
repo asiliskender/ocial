@@ -1,0 +1,33 @@
+{% extends '../temp/classroom_base.html' %} {% load static %} {% load my_tags %} {% block content %}
+
+<div class="container-fluid" style="margin-top:20px;">
+
+    <div class="row" style="background-color: #efefef;margin-bottom: 20px;">
+        <div class="col-4"><img style="object-fit: cover; width: 400px;" src="{{course.image.url}}" height="250"></div>
+
+        <div class="col ">
+            <h1>{{course.title}}</h1>
+            <p>{{course.description}}</p>
+            <a href="#" class="btn btn-danger">Resume Section</a>
+            <a href="{% url 'viewglossary' course.id %}" class="btn btn-danger ">Glossary</a>
+        </div>
+    </div>
+
+    {% for section in course.section_set.all %}
+
+    <div class="card mb-3">
+
+        <div class="card-header">
+            Section {{section.order}}
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">{{section.name}}</h5>
+            <p class="card-text">{{section.description}}</p>
+            <a href="{% url 'viewsection' section.id %}" class="btn btn-danger">Resume Section</a>
+        </div>
+    </div>
+    {% endfor %}
+
+</div>
+
+{%endblock%}

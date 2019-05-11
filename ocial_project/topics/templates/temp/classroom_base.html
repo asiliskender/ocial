@@ -100,6 +100,8 @@
                     <i class="fas fa-user-circle fa-fw"></i>
                 </a>
                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
+                    <p class="dropdown-item">{{user}}</p>
+                    <div class="dropdown-divider"></div>
                     <a class="dropdown-item" href="#">Settings</a>
                     <div class="dropdown-divider"></div>
                     <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">Logout</a>
@@ -112,21 +114,23 @@
     <div id="wrapper" style="margin-top:85px;">
 
     <ul class="sidebar navbar-nav" style="position: sticky;">
-    <li class="nav-item active">
+    {%if learner %}<li class="nav-item">{%elif teacher%}<li class="nav-item">{%else%}<li class="nav-item active"> {%endif%}
         <a class="nav-link" href="{% url 'classroom' %}">
             <i class="fas fa-fw fa-tachometer-alt"></i>
             <span>Dashboard</span>
         </a>
     </li>
-    <li class="nav-item">
-        <a class="nav-link" href="#">
-            <i class="fas fa-fw fa-chart-area"></i>
+    {%if learner %}<li class="nav-item active"> {%else%}<li class="nav-item">{%endif%}
+        <a class="nav-link" href="{% url 'learner' %}">
+            <i class="fas fa-graduation-cap"></i>
             <span>Learner</span></a>
     </li>
-    <li class="nav-item">
+    {%if teacher %}<li class="nav-item active"> {%else%}<li class="nav-item">{%endif%}
         <a class="nav-link" href="{% url 'teacher' %}">
-            <i class="fas fa-fw fa-table"></i>
+            <i class="fas fa-chalkboard-teacher"></i>
             <span>Teacher</span></a>
+    }
+    }
     </li>
 </ul>
 

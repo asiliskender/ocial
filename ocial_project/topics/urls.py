@@ -7,7 +7,7 @@ urlpatterns = [
     path('teacher',views.teacher, name= 'teacher'),
 	path('newcourse',views.newcourse, name= 'newcourse'),
 	path('editcourse/<int:course_id>/', views.editcourse, name = 'editcourse'),
-	path('course/<int:course_id>/glossary/', views.glossary, name = 'glossary'),
+	path('editcourse/<int:course_id>/glossary/', views.glossary, name = 'glossary'),
 	path('editsection/<int:section_id>/', views.editsection, name = 'editsection'),
 	path('editlecture/<int:lecture_id>/', views.editlecture, name = 'editlecture'),
 	path('editquiz/<int:quiz_id>/', views.editquiz, name = 'editquiz'),
@@ -22,6 +22,12 @@ urlpatterns = [
     path('deletechoice/<int:choice_id>/', views.deletechoice, name = 'deletechoice'),
     path('deleteglossary/<int:glossary_id>/', views.deleteglossary, name = 'deleteglossary'),
     path('newglossary/<int:course_id>/<str:wiki_id>', views.newglossary, name = 'newglossary'),
+    path('learner',views.learner, name= 'learner'),
+    path('viewcourse/<int:course_id>', views.viewcourse, name = 'viewcourse'),
+    path('viewcourse/<int:course_id>/glossary/', views.viewglossary, name = 'viewglossary'),
+    path('viewsection/<int:section_id>/', views.viewsection, name = 'viewsection'),
+
+
 
 
 

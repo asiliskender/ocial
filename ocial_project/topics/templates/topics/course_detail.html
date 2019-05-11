@@ -19,7 +19,13 @@
             <div class="card" style="width: 450px;">
                 <img class="card-img-top rounded-0" src="{{ course.image.url }}" alt="Card image cap">
                 <ul class="list-group list-group-flush">
-                    <a href="#" class="btn btn-danger btn-block">Enroll</a>
+                    {%if course.teacher == user %}
+                    <a href="{% url 'editcourse' course.id %}" class="btn btn-danger btn-block">Edit Course</a>
+                    {% elif user.username in learners %}
+                    <a href="{% url 'viewcourse' course.id %}" class="btn btn-danger btn-block">View Course</a>
+                    {% else %}
+                    <a href="{% url 'enrollcourse' course.id %}" class="btn btn-danger btn-block">Enroll</a>
+                    {%endif%}
                     <li class="list-group-item">
                         <a href="{%url 'exploretopic' course.topic.id %}">{{ course.topic.title }}</a>
                     </li>
@@ -27,7 +33,7 @@
                 </ul>
                 <div class="card-body">
                     {% for label in course.label.all %}
-                    <a href="#" class="badge badge-pill badge-danger" style="margin-bottom: 5px;">{{ label.name }}</a> {% endfor %}
+                    <a href="{% url 'explorelabel' label.id %}" class="badge badge-pill badge-danger" style="margin-bottom: 5px;">{{ label.name }}</a> {% endfor %}
                 </div>
 
             </div>

@@ -1,7 +1,7 @@
 <div class="container" style="margin-top:20px;">
 
-    {% for course in courses %}
-
+   {% for course in learner.course.all %}
+    
     <div class="card mb-3" style="max-width: 1200px; max-height: 450px;">
         <div class="row no-gutters">
             <div class="col-md-4" >
@@ -9,7 +9,7 @@
             </div>
             <div class="col-md-8 ">
                 <div class="card-body ">
-                    <a href="{% url 'editcourse' course.id %} "><h5 class="card-title ">{{ course.title }}</h5></a>
+                    <a href="{% url 'viewcourse' course.id %} "><h5 class="card-title ">{{ course.title }}</h5></a>
                     <p class="card-text ">{{ course.summary }}</p>
                     <p class="card-text "><small class="text-muted "><a href="{%url 'exploretopic' course.topic.id %}">{{ course.topic }}</a></small></p>
                 </div>

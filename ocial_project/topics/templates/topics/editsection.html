@@ -153,7 +153,7 @@
 
                     <button type="button" class="btn btn-danger btn-block" data-toggle="modal" data-target="#resourceModal" data-whatever="@getbootstrap"><i class="fas fa-plus"></i> Add Resource</button>
 
-                                        <ul class="list-group mt-4">
+                    <ul class="list-group mt-4">
                         {% for resource in section.resource_set.all %}
                         <li class="list-group-item"><a target="_blank" href="{{resource.link.url}}">{{resource.name}}</a>
 
@@ -164,9 +164,7 @@
 
                     </ul>
 
-                    <br />
-
-                    {% endif %}
+                    <br /> {% endif %}
 
                     <button type="submit" name="save_section" id="save_section" class="btn btn-danger btn-block"><i class="far fa-save"></i> Save</button>
                     {% if section.id %}

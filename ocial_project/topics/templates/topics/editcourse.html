@@ -160,7 +160,8 @@
                     <input type="text" class="form-control" name="labels" placeholder="Labels">
 
                     <br /> {% if course.id %} {% if course.published == True %}
-                    <small>Published at: {{course.pub_date_exact}}</small> {% else %}
+                    <small>Published at: {{course.pub_date_exact}} <a href="{% url 'coursedetail' course.id %}" target="_blank">View Course</a></small> 
+                    {% else %}
                     <small>Saved at: {{course.pub_date_exact}}</small> {% endif %} {% endif %}
 
                     <br />
