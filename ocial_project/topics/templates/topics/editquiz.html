@@ -61,7 +61,9 @@
             <div class="row">
                 <div class="col-sm-8">
 
-                    {% if quiz.id %}<small>Section: {{quiz.section}}</small>{% endif %}
+                    {% if quiz.id %}                    
+                    <small>{{quiz.section.course}} / {{quiz.section}}</small>
+                    {% endif %}
                     <input type="text" class="form-control" name="quiztitle" placeholder="Quiz Title" value="{{ quiz.title }}">
 
                     <input type="hidden" name="question-order" id="question-order">

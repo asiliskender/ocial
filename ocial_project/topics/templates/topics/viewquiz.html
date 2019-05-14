@@ -6,7 +6,7 @@
 
         <div class="col">
 
-            <small>{{quiz.order}}. {{quiz|verbose_name}} </small>
+            <small>{{quiz.section.course}} / {{quiz.section}} </small>
             <h3>{{quiz.title}}</h3>
 
         </div>
@@ -43,7 +43,7 @@
 
             <br />
 
-            <a href="{% url 'viewglossary' quiz.section.course.id %}" target="_blank" class="btn btn-danger btn-block ">Glossary</a>
+            <a href="{% url 'viewglossary' quiz.section.course.id %}" target="_blank" class="btn btn-outline-danger btn-block ">Glossary</a>
 
         </div>
 

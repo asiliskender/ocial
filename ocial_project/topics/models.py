@@ -67,7 +67,7 @@ class Section(models.Model):
 	course = models.ForeignKey('Course', on_delete=models.CASCADE)
 	order =  models.IntegerField(default=1)
 	description = models.TextField(blank=True)
-	course_learner = models.ManyToManyField(Learner, blank=True,through='Learner_Section_Record')
+	section_learner = models.ManyToManyField(Learner, blank=True,through='Learner_Section_Record')
 
 	class Meta:
 		ordering = ['order']
@@ -88,6 +88,8 @@ class Lecture(models.Model):
 	body = models.TextField(blank=True)
 	section = models.ForeignKey('Section', on_delete=models.CASCADE)
 	order =  models.IntegerField(default=1)
+	lecture_learner = models.ManyToManyField(Learner, blank=True,through='Learner_Lecture_Record')
+
 
 	class Meta:
 		ordering = ['order']
@@ -96,12 +98,20 @@ class Lecture(models.Model):
 	def __str__(self):
 		return self.title
 
+class Learner_Lecture_Record(models.Model):
+    learner = models.ForeignKey(Learner, on_delete=models.CASCADE)
+    lecture = models.ForeignKey(Lecture, on_delete=models.CASCADE)
+    isFinished = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.learner.user.username + " - " +self.lecture.title
+
 class Quiz(models.Model):
 	title = models.CharField(max_length=200)
 	section = models.ForeignKey('Section', on_delete=models.CASCADE)
 	order =  models.IntegerField(default=1)
 	successrate =  models.IntegerField(default=0)
-
+	quiz_learner = models.ManyToManyField(Learner, blank=True,through='Learner_Quiz_Record')
 
 	class Meta:
 		ordering = ['order']
@@ -109,6 +119,14 @@ class Quiz(models.Model):
 
 	def __str__(self):
 		return self.title
+
+class Learner_Quiz_Record(models.Model):
+    learner = models.ForeignKey(Learner, on_delete=models.CASCADE)
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
+    isFinished = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.learner.user.username + " - " +self.quiz.title
 
 class Question(models.Model):
 	title = models.TextField(blank=True)
