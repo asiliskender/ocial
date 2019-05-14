@@ -16,7 +16,10 @@
         <div class="col ">
             <h1>{{course.title}}</h1>
             <p>{{course.description}}</p>
-            <a href="#"class="btn btn-danger">Resume Section</a>
+            {% for section in lsr|slice:":1" %}
+            <a href="{% url 'viewsection' section.id %}" class="btn btn-danger">Resume Section {{section.order}}</a>
+            {% endfor %}
+
             <a href="{% url 'viewcourse' course.id %}" class="btn btn-outline-danger ">Quit</a>
 
         </div>

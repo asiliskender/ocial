@@ -34,7 +34,7 @@
 
             <ul class="list-group">
 
-                {% for resource in lecture.section.resource_set.all %}
+                {% for resource in quiz.section.resource_set.all %}
                 <li class="list-group-item"><a target="_blank" href="{{resource.link.url}}">{{resource.name}}</a></li>
                 {% endfor %}
 

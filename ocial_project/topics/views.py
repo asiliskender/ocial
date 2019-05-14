@@ -652,8 +652,19 @@ def viewcourse(request,course_id):
 @login_required
 def viewglossary(request,course_id):
 	course =  get_object_or_404(Course,pk=course_id, published=True)
-	learner = Learner.objects.filter(user= request.user)
-	return render(request, 'topics/viewglossary.html',{'learner':learner,'course': course })
+	learner = get_object_or_404(Learner, user= request.user)
+	learner_course_record = Learner_Course_Record.objects.filter(learner = learner)
+
+	lsr = list()
+
+	for section in course.section_set.all():
+		learner_section = Learner_Section_Record.objects.filter(learner = learner, section = section)
+		if learner_section:
+			if learner_section[0].isFinished != True:
+				lsr.append(learner_section[0].section)
+
+
+	return render(request, 'topics/viewglossary.html',{'learner':learner,'course': course , 'lsr': lsr})
 
 @login_required
 def viewsection(request,section_id):
