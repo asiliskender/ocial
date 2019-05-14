@@ -692,17 +692,31 @@ def viewsection(request,section_id):
 def viewlecture(request,lecture_id):
 	lecture =  get_object_or_404(Lecture,pk=lecture_id)
 	learner = get_object_or_404(Learner, user= request.user)
-	learningpath = createlearningpath(lecture.section.id)
 
-	return render(request, 'topics/viewlecture.html',{'learner':learner,'lecture': lecture, 'learningpath':learningpath})
+	learner_lecture_record, created = Learner_Lecture_Record.objects.get_or_create(learner=learner,lecture=lecture)
+	learner_lecture_record.save()
+
+	learningpath = createlearningpath(lecture.section.id)
+	lir,lir_finished = pathitemstate(lecture.section.id,learner)
+
+
+	return render(request, 'topics/viewlecture.html',{'learner':learner,'lecture': lecture, 'learningpath':learningpath, 'lir':lir, 'lir_finished':lir_finished})
 
 @login_required
 def viewquiz(request,quiz_id):
 	quiz =  get_object_or_404(Quiz,pk=quiz_id)
 	learner = get_object_or_404(Learner, user= request.user)
-	learningpath = createlearningpath(quiz.section.id)
 
-	return render(request, 'topics/viewquiz.html',{'learner':learner,'quiz': quiz, 'learningpath':learningpath})
+	learner_quiz_record, created = Learner_Quiz_Record.objects.get_or_create(learner=learner,quiz=quiz)
+	learner_quiz_record.save()
+
+	learningpath = createlearningpath(quiz.section.id)
+	lir,lir_finished = pathitemstate(quiz.section.id,learner)
+
+
+
+
+	return render(request, 'topics/viewquiz.html',{'learner':learner,'quiz': quiz, 'learningpath':learningpath, 'lir':lir, 'lir_finished':lir_finished})
 
 def createlearningpath(section_id):
 	lectures = Lecture.objects.filter(section= section_id)
@@ -720,5 +734,55 @@ def createlearningpath(section_id):
 
 	return learningpath
 
+def pathitemstate(section_id,learner):
 
+	learningpath = createlearningpath(section_id)
+
+	lectures = Lecture.objects.filter(section= section_id)
+	quizes = Quiz.objects.filter(section=section_id)
+	
+	#learner_lecture_record
+	llr = list()
+	llr_finished= list()
+
+	for lecture in lectures:
+		learner_lecture = Learner_Lecture_Record.objects.filter(learner = learner, lecture = lecture)
+		if learner_lecture:
+			if learner_lecture[0].isFinished == True:
+				llr_finished.append(learner_lecture[0].lecture)
+			else:
+				llr.append(learner_lecture[0].lecture)
+
+	#learner_quiz_record
+	lqr = list()
+	lqr_finished= list()
+
+	for quiz in quizes:
+		quiz_lecture = Learner_Quiz_Record.objects.filter(learner = learner, quiz = quiz)
+		if quiz_lecture:
+			if quiz_lecture[0].isFinished == True:
+				lqr_finished.append(quiz_lecture[0].quiz)
+			else:
+				lqr.append(quiz_lecture[0].quiz)
+
+	lir = list()
+
+	for lecture in llr:
+		lir.append(lecture)
+	for quiz in lqr:
+		lir.append(quiz)
+
+	lir.sort(key=lambda x: x.order, reverse=False)
+
+
+	lir_finished = list()
+
+	for lecture in llr_finished:
+		lir_finished.append(lecture)
+	for quiz in lqr_finished:
+		lir_finished.append(quiz)
+
+	lir_finished.sort(key=lambda x: x.order, reverse=False)
+
+	return lir, lir_finished
 
