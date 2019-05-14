@@ -91,11 +91,11 @@ def exploreteacher(request,id):
 
 def coursedetail(request, course_id):
 	course =  get_object_or_404(Course,pk=course_id, published=True)
-	learners_query = list(Learner.objects.filter(course = course))
+	learners_query = list(Learner_Course_Record.objects.filter(course = course_id))
 	learners = list()
 
 	for learner in learners_query:
-		learners.append(learner.user.username)
+		learners.append(learner.learner.user.username)
 	return render(request, 'topics/course_detail.html', {'learners':learners,'course': course})
 
 
@@ -609,37 +609,96 @@ def deletechoice(request,choice_id):
 @login_required
 def enrollcourse(request,course_id):
 	course =  get_object_or_404(Course,pk=course_id, published=True)
+
 	learner, created = Learner.objects.get_or_create(user=request.user)
 	learner.save()
-	learner.course.add(course)
+
+	learner_course_record, created = Learner_Course_Record.objects.get_or_create(learner=learner,course=course)
+	learner_course_record.save()
+
 	return redirect('viewcourse', course_id=course_id)
 
 @login_required
 def learner(request):
 	learner, created = Learner.objects.get_or_create(user=request.user)
-	return render(request, 'topics/learner.html',{'learner': learner })
+	learner_course_record = Learner_Course_Record.objects.filter(learner = learner)
+
+	lcr = list()
+
+	for course in learner_course_record.all():
+		lcr.append(learner_course_record[0].course)
+
+	return render(request, 'topics/learner.html',{'learner': learner, 'lcr':lcr })
 
 @login_required
 def viewcourse(request,course_id):
 	course =  get_object_or_404(Course,pk=course_id, published=True)
-	learner = Learner.objects.filter(course= course, user= request.user)
-	return render(request, 'topics/viewcourse.html',{'learner':learner,'course': course })
+	learner = get_object_or_404(Learner, user= request.user)
+
+	lsr = list()
+	lsr_finished= list()
+
+	for section in course.section_set.all():
+		learner_section = Learner_Section_Record.objects.filter(learner = learner, section = section)
+		if learner_section:
+			if learner_section[0].isFinished == True:
+				lsr_finished.append(learner_section[0].section)
+			else:
+				lsr.append(learner_section[0].section)
+
+
+	return render(request, 'topics/viewcourse.html',{'learner':learner,'course': course, 'lsr': lsr,'lsr_finished': lsr_finished})
 
 @login_required
 def viewglossary(request,course_id):
 	course =  get_object_or_404(Course,pk=course_id, published=True)
-	learner = Learner.objects.filter(course= course, user= request.user)
+	learner = Learner.objects.filter(user= request.user)
 	return render(request, 'topics/viewglossary.html',{'learner':learner,'course': course })
 
 @login_required
 def viewsection(request,section_id):
 	section =  get_object_or_404(Section,pk=section_id)
-	learner = Learner.objects.filter(course= section.course, user= request.user)
+	learner = get_object_or_404(Learner, user= request.user)
 
+	learner_section_record, created = Learner_Section_Record.objects.get_or_create(learner=learner,section=section)
+	learner_section_record.save()
+
+	
+	learningpath = createlearningpath(section_id)
+
+	try:
+		if isinstance(learningpath[0], Lecture):
+			return redirect('viewlecture', lecture_id=learningpath[0].id)
+		if isinstance(learningpath[0], Quiz):
+			return redirect('viewquiz', quiz_id=learningpath[0].id)
+	except:
+		pass
+
+
+	return render(request, 'topics/viewsection.html',{'learner':learner,'section': section, 'learningpath':learningpath})
+
+@login_required
+def viewlecture(request,lecture_id):
+	lecture =  get_object_or_404(Lecture,pk=lecture_id)
+	learner = get_object_or_404(Learner, user= request.user)
+	learningpath = createlearningpath(lecture.section.id)
+
+	return render(request, 'topics/viewlecture.html',{'learner':learner,'lecture': lecture, 'learningpath':learningpath})
+
+@login_required
+def viewquiz(request,quiz_id):
+	quiz =  get_object_or_404(Quiz,pk=quiz_id)
+	learner = get_object_or_404(Learner, user= request.user)
+	learningpath = createlearningpath(quiz.section.id)
+
+	return render(request, 'topics/viewquiz.html',{'learner':learner,'quiz': quiz, 'learningpath':learningpath})
+
+def createlearningpath(section_id):
 	lectures = Lecture.objects.filter(section= section_id)
 	quizes = Quiz.objects.filter(section=section_id)
 
 	learningpath = list()
+
 
 	for lecture in lectures:
 		learningpath.append(lecture)
@@ -647,5 +706,8 @@ def viewsection(request,section_id):
 		learningpath.append(quiz)
 
 	learningpath.sort(key=lambda x: x.order, reverse=False)
-	return render(request, 'topics/viewsection.html',{'learner':learner,'section': section, 'learningpath':learningpath})
+
+	return learningpath
+
+
 

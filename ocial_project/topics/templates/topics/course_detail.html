@@ -8,15 +8,15 @@
 
     <div class="row">
 
-        <div class="col">
+        <div class="col-6">
             <small>{{ course.pub_date }}</small>
             <h1 class="card-title">{{ course.title }}</h1>
             <p>{{ course.description }}</p>
             <h3>What you will learn?</h3> {{ course.wywl | safe }}
         </div>
 
-        <div class="col">
-            <div class="card" style="width: 450px;">
+        <div class="col-6">
+            <div class="card" >
                 <img class="card-img-top rounded-0" src="{{ course.image.url }}" alt="Card image cap">
                 <ul class="list-group list-group-flush">
                     {%if course.teacher == user %}

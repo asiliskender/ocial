@@ -6,6 +6,10 @@
 
         <div class="col">
 
+            <small>{{lecture.order}}. {{lecture|verbose_name}} </small>
+            <h3>{{lecture.title}}</h3>
+
+            <p>{{lecture.body | safe}}</p>
 
         </div>
 
@@ -16,11 +20,11 @@
 
                 {% if pathitem|verbose_name == "Lecture" %}
 
-                <li class="list-group-item"><a href="{% url 'viewlecture' lecture.id %}">{{pathitem.order}}. {{pathitem|verbose_name}}: {{pathitem.title}}</a></li>
+                <li class="list-group-item"><a href="{% url 'viewlecture' pathitem.id %}">{{pathitem.order}}. {{pathitem|verbose_name}}: {{pathitem.title}}</a></li>
 
                 {%elif pathitem|verbose_name == "Quiz" %}
 
-                <li class="list-group-item"><a href="{% url 'viewquiz' lecture.id %}">{{pathitem.order}}. {{pathitem|verbose_name}}: {{pathitem.title}}</a></li>
+                <li class="list-group-item"><a href="{% url 'viewquiz' pathitem.id %}">{{pathitem.order}}. {{pathitem|verbose_name}}: {{pathitem.title}}</a></li>
                 
                 {%endif%}
 
@@ -32,11 +36,15 @@
 
             <ul class="list-group">
 
-                {% for resource in section.resource_set.all %}
+                {% for resource in lecture.section.resource_set.all %}
                 <li class="list-group-item"><a target="_blank" href="{{resource.link.url}}">{{resource.name}}</a></li>
                 {% endfor %}
 
             </ul>
+
+            <br />
+
+            <a href="{% url 'viewglossary' lecture.section.course.id %}" target="_blank" class="btn btn-danger btn-block ">Glossary</a>
 
         </div>
 

@@ -8,7 +8,10 @@
         <div class="col ">
             <h1>{{course.title}}</h1>
             <p>{{course.description}}</p>
-            <a href="#" class="btn btn-danger">Resume Section</a>
+            {% for section in lsr|slice:":1" %}
+            <a href="{% url 'viewsection' section.id %}" class="btn btn-danger">Resume Section {{section.order}}</a>
+            {% endfor %}
+
             <a href="{% url 'viewglossary' course.id %}" class="btn btn-danger ">Glossary</a>
         </div>
     </div>
@@ -18,12 +21,19 @@
     <div class="card mb-3">
 
         <div class="card-header">
-            Section {{section.order}}
+            Section {{section.order}} {%if section in lsr_finished %}
+<i class="fas fa-check" style="color:green;"></i>{%endif%}
         </div>
         <div class="card-body">
             <h5 class="card-title">{{section.name}}</h5>
             <p class="card-text">{{section.description}}</p>
-            <a href="{% url 'viewsection' section.id %}" class="btn btn-danger">Resume Section</a>
+                {%if section in lsr %}
+                <a href="{% url 'viewsection' section.id %}" class="btn btn-danger">Resume Section</a>
+                {%elif section in lsr_finished %}
+                <a href="{% url 'viewsection' section.id %}" class="btn btn-danger">View Section</a>
+                {%else%}
+                <a href="{% url 'viewsection' section.id %}" class="btn btn-danger">Start Section</a>
+                {%endif%}
         </div>
     </div>
     {% endfor %}

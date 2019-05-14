@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import Count
+from accounts.models import *
+
 
 
 class Topic(models.Model):
@@ -20,7 +22,7 @@ class Course(models.Model):
 	topic = models.ForeignKey('Topic', on_delete=models.CASCADE)
 	label = models.ManyToManyField('Label', blank=True)
 	published = models.BooleanField(default=False)
-
+	course_learner = models.ManyToManyField(Learner, blank=True,through='Learner_Course_Record')
 
 	def pub_date_exact(self):
 		return self.pubdate.strftime('%e %B %Y %H:%M')
@@ -41,6 +43,14 @@ class Label(models.Model):
 	def __str__(self):
 		return self.name
 
+class Learner_Course_Record(models.Model):
+    learner = models.ForeignKey(Learner, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    isFinished = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.learner.user.username + " - " +self.course.title
+
 class Glossary(models.Model):
 	name = models.CharField(max_length=200)
 	image_url = models.CharField(max_length=1000, blank=True)
@@ -57,13 +67,21 @@ class Section(models.Model):
 	course = models.ForeignKey('Course', on_delete=models.CASCADE)
 	order =  models.IntegerField(default=1)
 	description = models.TextField(blank=True)
-
+	course_learner = models.ManyToManyField(Learner, blank=True,through='Learner_Section_Record')
 
 	class Meta:
 		ordering = ['order']
 
 	def __str__(self):
 		return self.name
+
+class Learner_Section_Record(models.Model):
+    learner = models.ForeignKey(Learner, on_delete=models.CASCADE)
+    section = models.ForeignKey(Section, on_delete=models.CASCADE)
+    isFinished = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.learner.user.username + " - " +self.section.name
 
 class Lecture(models.Model):
 	title = models.CharField(max_length=200)
