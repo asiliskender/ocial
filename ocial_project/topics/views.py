@@ -625,8 +625,8 @@ def learner(request):
 
 	lcr = list()
 
-	for course in learner_course_record.all():
-		lcr.append(learner_course_record[0].course)
+	for learner_cr in learner_course_record:
+		lcr.append(learner_cr.course)
 
 	return render(request, 'topics/learner.html',{'learner': learner, 'lcr':lcr })
 
