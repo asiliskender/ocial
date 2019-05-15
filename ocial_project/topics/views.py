@@ -372,6 +372,12 @@ def savesection(request,section):
 
 	section.name = request.POST['sectionname']
 	section.description = request.POST['sectiondescription']
+
+	if 'sectionislinked' in request.POST:
+		section.isLinked = True
+	else:
+		section.isLinked = False
+
 	section.save()
 
 @login_required

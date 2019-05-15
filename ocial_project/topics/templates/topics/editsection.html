@@ -85,9 +85,14 @@
                         </div>
                     </div>
 
+                    {%if section.isLinked == True%}
+                    <input type="checkbox" name="sectionislinked" value="True" checked> Linked Section {% elif section.isLinked == False%}
+                    <input type="checkbox" name="sectionislinked" value="True"> Linked Section 
+                    {% endif %}
+                    <br />
                     <br />
 
-                    <button type="button" class="btn btn-danger btn-block" data-toggle="modal" data-target="#lectureModal" data-whatever="@getbootstrap"><i class="fas fa-plus"></i> Add</button>
+                    <button type="button" class="btn btn-danger btn-block" data-toggle="modal" data-target="#lectureModal" data-whatever="@getbootstrap"><i class="fas fa-plus"></i> Add Quiz/Lecture</button>
 
                     <input type="hidden" name="lp-order" id="lp-order">
 

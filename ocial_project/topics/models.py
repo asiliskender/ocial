@@ -68,6 +68,7 @@ class Section(models.Model):
 	order =  models.IntegerField(default=1)
 	description = models.TextField(blank=True)
 	section_learner = models.ManyToManyField(Learner, blank=True,through='Learner_Section_Record')
+	isLinked = models.BooleanField(default=False)
 
 	class Meta:
 		ordering = ['order']

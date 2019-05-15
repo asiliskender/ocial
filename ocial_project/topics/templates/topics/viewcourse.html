@@ -3,9 +3,9 @@
 <div class="container-fluid" style="margin-top:20px;">
 
     <div class="row" style="background-color: #efefef;margin-bottom: 20px;">
-        <div class="col-4"><img style="object-fit: cover; width: 400px;" src="{{course.image.url}}" height="250"></div>
+        <div class="col-lg-4"><img style="object-fit: cover; width: 100%;" src="{{course.image.url}}" height="250"></div>
 
-        <div class="col ">
+        <div class="col">
             <h1>{{course.title}}</h1>
             <p>{{course.description}}</p>
             {% for section in lsr|slice:":1" %}
