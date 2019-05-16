@@ -208,8 +208,6 @@ def glossary(request, course_id):
 	course =  get_object_or_404(Course,pk=course_id)
 	teacher = course.teacher
 
-	print(request.POST)
-
 	if 'search_glossary' in request.POST:
 		if request.POST['search_glossary']:
 			API_ENDPOINT = "https://www.wikidata.org/w/api.php"
@@ -218,7 +216,7 @@ def glossary(request, course_id):
 			    'action': 'wbsearchentities',
 			    'format': 'json',
 			    'language': 'en',
-			    'limit': '20',
+			    'limit': '2000',
 			    'search': query
 			}
 			wiki_request = requests.get(API_ENDPOINT, params = params)
@@ -705,6 +703,18 @@ def viewlecture(request,lecture_id):
 	learningpath = createlearningpath(lecture.section.id)
 	lir,lir_finished = pathitemstate(lecture.section.id,learner)
 
+	lecture_index = learningpath.index(lecture)
+
+	if request.method == 'POST':
+		if 'finish_lecture' in request.POST:
+			if isinstance(learningpath[lecture_index + 1 ], Lecture):
+				learner_lecture_record.isFinished = True
+				learner_lecture_record.save()
+				return redirect('viewlecture', lecture_id=learningpath[lecture_index + 1].id)
+			elif isinstance(learningpath[lecture_index + 1 ], Quiz):
+				learner_lecture_record.isFinished = True
+				learner_lecture_record.save()
+				return redirect('viewquiz', quiz_id=learningpath[lecture_index + 1].id)
 
 	return render(request, 'topics/viewlecture.html',{'learner':learner,'lecture': lecture, 'learningpath':learningpath, 'lir':lir, 'lir_finished':lir_finished})
 

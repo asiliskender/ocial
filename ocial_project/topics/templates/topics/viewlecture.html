@@ -11,6 +11,13 @@
 
             <p>{{lecture.body | safe}}</p>
 
+            <form method="POST" action="{% url 'viewlecture' lecture.id %}" enctype="multipart/form-data">
+        	{% csrf_token %}
+
+        	<button type="submit" style="float:right;" name="finish_lecture" class="btn btn-danger">Next <i class="fa fa-chevron-right"></i></button>
+
+            </form>
+
         </div>
 
         <div class="col-3">
