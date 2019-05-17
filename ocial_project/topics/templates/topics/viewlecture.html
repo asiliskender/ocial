@@ -14,8 +14,18 @@
             <form method="POST" action="{% url 'viewlecture' lecture.id %}" enctype="multipart/form-data">
         	{% csrf_token %}
 
-        	<button type="submit" style="float:right;" name="finish_lecture" class="btn btn-danger">Next <i class="fa fa-chevron-right"></i></button>
 
+
+            {% if lecture == learningpath|last %}
+
+                <button type="submit" style="float:right;margin-bottom: 30px;" name="finish_section" class="btn btn-danger">Finish Section</button>
+
+            {%else%}
+            
+                <button type="submit" style="float:right; margin-bottom: 30px;" name="finish_lecture" class="btn btn-danger">Next <i class="fa fa-chevron-right"></i></button>
+
+            {%endif%}
+            
             </form>
 
         </div>
@@ -39,6 +49,8 @@
             <br />
 
             <a href="{% url 'viewglossary' lecture.section.course.id %}" target="_blank" class="btn btn-outline-danger btn-block ">Glossary</a>
+
+            <a href="{% url 'viewcourse' lecture.section.course.id %}" class="btn btn-danger btn-block ">Exit</a>
 
         </div>
 

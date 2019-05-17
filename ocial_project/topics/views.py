@@ -13,11 +13,6 @@ from django.core.files import File
 from django.core.files.base import ContentFile
 from .decorators import *
 
-
-
-
-
-
 def home(request):
 	topics = Topic.objects.annotate(number_of_courses=Count('course')) 
 	topics = sorted(topics, key=operator.attrgetter('number_of_courses'),reverse=True)
@@ -681,16 +676,45 @@ def viewsection(request,section_id):
 	
 	learningpath = createlearningpath(section_id)
 
+	if isinstance(learningpath[0], Lecture):
+		learner_lecture_record, created = Learner_Lecture_Record.objects.get_or_create(learner=learner,lecture=learningpath[0])
+		learner_lecture_record.save()
+	elif isinstance(learningpath[0], Quiz):
+		learner_quiz_record, created = Learner_Quiz_Record.objects.get_or_create(learner=learner,quiz=learningpath[0])
+		learner_quiz_record.save()
+
+	lir,lir_finished = pathitemstate(section.id,learner)
+
 	try:
-		if isinstance(learningpath[0], Lecture):
-			return redirect('viewlecture', lecture_id=learningpath[0].id)
-		if isinstance(learningpath[0], Quiz):
-			return redirect('viewquiz', quiz_id=learningpath[0].id)
+		try:
+			if isinstance(lir[0], Lecture):
+				return redirect('viewlecture', lecture_id=lir[0].id)
+			if isinstance(lir[0], Quiz):
+				return redirect('viewquiz', quiz_id=lir[0].id)
+		except:
+			if isinstance(lir_finished[0], Lecture):
+				return redirect('viewlecture', lecture_id=lir_finished[0].id)
+			if isinstance(lir_finished[0], Quiz):
+				return redirect('viewquiz', quiz_id=lir_finished[0].id)
 	except:
 		pass
 
-
 	return render(request, 'topics/viewsection.html',{'learner':learner,'section': section, 'learningpath':learningpath})
+
+@login_required
+def sectionfinishcheck(request,section_id):
+
+	learner = get_object_or_404(Learner, user= request.user)
+	section =  get_object_or_404(Section,pk=section_id)
+	learner_section_record, created = Learner_Section_Record.objects.get_or_create(learner=learner,section=section)
+	lir,lir_finished = pathitemstate(section.id,learner)
+	learningpath = createlearningpath(section.id)
+
+	if len(lir_finished) == len(learningpath):
+		print(learner_section_record.id)
+		learner_section_record.isFinished = True
+		learner_section_record.save()
+
 
 @login_required
 def viewlecture(request,lecture_id):
@@ -706,14 +730,23 @@ def viewlecture(request,lecture_id):
 	lecture_index = learningpath.index(lecture)
 
 	if request.method == 'POST':
-		if 'finish_lecture' in request.POST:
+		if 'finish_section' in request.POST:
+			learner_lecture_record.isFinished = True
+			learner_lecture_record.save()
+		
+			lir,lir_finished = pathitemstate(lecture.section.id,learner)
+			if len(lir_finished) == len(learningpath):
+				sectionfinishcheck(request,lecture.section.id)
+				return redirect('viewcourse', course_id=lecture.section.course.id)
+			elif len(lir_finished) != len(learningpath):
+				return redirect('viewsection', section_id=lecture.section.id)
+		elif 'finish_lecture' in request.POST:
+			learner_lecture_record.isFinished = True
+			learner_lecture_record.save()
+			sectionfinishcheck(request,lecture.section.id)
 			if isinstance(learningpath[lecture_index + 1 ], Lecture):
-				learner_lecture_record.isFinished = True
-				learner_lecture_record.save()
 				return redirect('viewlecture', lecture_id=learningpath[lecture_index + 1].id)
 			elif isinstance(learningpath[lecture_index + 1 ], Quiz):
-				learner_lecture_record.isFinished = True
-				learner_lecture_record.save()
 				return redirect('viewquiz', quiz_id=learningpath[lecture_index + 1].id)
 
 	return render(request, 'topics/viewlecture.html',{'learner':learner,'lecture': lecture, 'learningpath':learningpath, 'lir':lir, 'lir_finished':lir_finished})
@@ -729,7 +762,49 @@ def viewquiz(request,quiz_id):
 	learningpath = createlearningpath(quiz.section.id)
 	lir,lir_finished = pathitemstate(quiz.section.id,learner)
 
+	quiz_index = learningpath.index(quiz)
 
+
+	if request.method == 'POST':
+		questions = quiz.question_set.all()
+		number_of_questions = len(questions)
+		successrate = 0
+		for question in questions:
+			choice_question_id = "choice-radio-"+ str(question.id)
+			if choice_question_id in request.POST:
+				answer_id = request.POST[choice_question_id]
+				answer =  get_object_or_404(Choice,pk=answer_id)
+				if answer.isTrue == True:
+					successrate += (1/number_of_questions)*100
+					successrate = int(successrate)
+
+		if 'finish_section' in request.POST:
+			if successrate >= quiz.successrate:
+				learner_quiz_record.isFinished = True
+				learner_quiz_record.save()
+			elif successrate < quiz.successrate:
+				error = "Quiz Passing Criteria is " + str(quiz.successrate) + ". Your score is " + str(successrate) +"."
+				return render(request, 'topics/viewquiz.html',{'learner':learner,'quiz': quiz, 'learningpath':learningpath, 'lir':lir, 'lir_finished':lir_finished, 'error': error})
+
+			lir,lir_finished = pathitemstate(quiz.section.id,learner)
+			if len(lir_finished) == len(learningpath):
+				sectionfinishcheck(request,quiz.section.id)
+				return redirect('viewcourse', course_id=quiz.section.course.id)
+			elif len(lir_finished) != len(learningpath):
+				return redirect('viewsection', section_id=quiz.section.id)
+
+		elif 'finish_quiz' in request.POST:
+			if successrate >= quiz.successrate:
+				learner_quiz_record.isFinished = True
+				learner_quiz_record.save()
+				sectionfinishcheck(request,quiz.section.id)
+				if isinstance(learningpath[quiz_index + 1 ], Lecture):
+					return redirect('viewlecture', lecture_id=learningpath[quiz_index + 1].id)
+				elif isinstance(learningpath[quiz_index + 1 ], Quiz):
+					return redirect('viewquiz', quiz_id=learningpath[quiz_index + 1].id)
+			elif successrate < quiz.successrate:
+				error = "Quiz Passing Criteria is " + str(quiz.successrate) + ". Your score is " + str(successrate) +"."
+				return render(request, 'topics/viewquiz.html',{'learner':learner,'quiz': quiz, 'learningpath':learningpath, 'lir':lir, 'lir_finished':lir_finished, 'error': error})
 
 
 	return render(request, 'topics/viewquiz.html',{'learner':learner,'quiz': quiz, 'learningpath':learningpath, 'lir':lir, 'lir_finished':lir_finished})

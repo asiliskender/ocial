@@ -2,21 +2,60 @@
 
 <div class="container-fluid" style="margin-top:40px;">
 
+
+
     <div class="row">
 
         <div class="col">
 
+        {% if error %}
+
+             <p style="color:red;" class="text-center"> {{error}} </p>
+
+        {%endif%}
+
             <small>{{quiz.section.course}} / {{quiz.section}} </small>
-            <h3>{{quiz.title}}</h3>
+            <h3>{{quiz.title}}</h3> 
+
+            <form method="POST" action="{% url 'viewquiz' quiz.id %}" enctype="multipart/form-data">
+                {% csrf_token %}
+
+            {% for question in quiz.question_set.all %}
+                <div class="card" style="margin-top:40px;">
+                    <h5 class="card-header">{{question}}</h5>
+                    <ul class="list-group list-group-flush">
+                        {% for choice in question.choice_set.all %}
+                        <li class="list-group-item">
+                            <input type="radio" name="choice-radio-{{question.id}}" value="{{choice.id}}"> {{choice.title}}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endfor %}
+        
+            <br />
+
+
+                {% if quiz == learningpath|last %}
+
+                <button type="submit" style="float:right;margin-bottom: 30px;" name="finish_section" class="btn btn-danger">Finish Section</button>
+
+                {%else%}
+
+                <button type="submit" style="float:right;margin-bottom: 30px;" name="finish_quiz" class="btn btn-danger">Next <i class="fa fa-chevron-right"></i></button>
+
+                {%endif%}
+
+            </form>
 
         </div>
 
         <div class="col-3">
 
-            {% if quiz.section.isLinked == False %}
-            {% include "../temp/lp_section_not_linked.html" %}
-            {% elif quiz.section.isLinked == True %}
-            {% include "../temp/lp_section_is_linked.html" %}
+            {% if quiz.section.isLinked == False %} 
+                {% include "../temp/lp_section_not_linked.html" %} 
+            {% elif quiz.section.isLinked == True %} 
+                {% include "../temp/lp_section_is_linked.html" %} 
             {% endif %}
 
             <br />
@@ -31,6 +70,9 @@
             <br />
 
             <a href="{% url 'viewglossary' quiz.section.course.id %}" target="_blank" class="btn btn-outline-danger btn-block ">Glossary</a>
+
+
+            <a href="{% url 'viewcourse' quiz.section.course.id %}" class="btn btn-danger btn-block ">Exit</a>
 
         </div>
 
