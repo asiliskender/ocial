@@ -622,12 +622,22 @@ def learner(request):
 	learner, created = Learner.objects.get_or_create(user=request.user)
 	learner_course_record = Learner_Course_Record.objects.filter(learner = learner)
 
-	lcr = list()
-
 	for learner_cr in learner_course_record:
-		lcr.append(learner_cr.course)
+		coursefinishcheck(request,learner_cr.course.id)
 
-	return render(request, 'topics/learner.html',{'learner': learner, 'lcr':lcr })
+	learner_course_record = Learner_Course_Record.objects.filter(learner = learner)
+
+	lcr = list()
+	for learner_cr in learner_course_record:
+		lcr.append(learner_cr)
+
+	lcr_finished = list()
+	for learner_cr in learner_course_record:
+		coursefinishcheck(request,learner_cr.course.id)
+		if learner_cr.isFinished == True:
+			lcr_finished.append(learner_cr)
+
+	return render(request, 'topics/learner.html',{'learner': learner, 'lcr':lcr, 'lcr_finished':lcr_finished })
 
 @login_required
 def viewcourse(request,course_id):
@@ -636,8 +646,37 @@ def viewcourse(request,course_id):
 
 	lsr = list()
 	lsr_finished= list()
+	lsr_all = list()
 
 	for section in course.section_set.all():
+		sectionfinishcheck(request,section.id)
+		learner_section = Learner_Section_Record.objects.filter(learner = learner, section = section)
+		if learner_section:
+			if learner_section[0].isFinished == True:
+				lsr_finished.append(learner_section[0].section)
+				lsr_all.append(learner_section[0])
+			else:
+				lsr.append(learner_section[0].section)
+				lsr_all.append(learner_section[0])
+
+	#coursefinishcheck(request,course_id)
+
+
+	return render(request, 'topics/viewcourse.html',{'learner':learner,'course': course, 'lsr': lsr,'lsr_all': lsr_all,'lsr_finished': lsr_finished})
+
+@login_required
+def coursefinishcheck(request,course_id):
+
+	learner = get_object_or_404(Learner, user= request.user)
+	course =  get_object_or_404(Course,pk=course_id)
+	learner_course_record, created = Learner_Course_Record.objects.get_or_create(learner=learner,course=course)
+	sections = Section.objects.filter(course= course_id)
+
+	lsr_finished = list()
+	lsr = list()
+
+	for section in sections:
+		sectionfinishcheck(request,section.id)
 		learner_section = Learner_Section_Record.objects.filter(learner = learner, section = section)
 		if learner_section:
 			if learner_section[0].isFinished == True:
@@ -646,7 +685,17 @@ def viewcourse(request,course_id):
 				lsr.append(learner_section[0].section)
 
 
-	return render(request, 'topics/viewcourse.html',{'learner':learner,'course': course, 'lsr': lsr,'lsr_finished': lsr_finished})
+	if len(lsr_finished) == len(course.section_set.all()):
+		learner_course_record.completeRate = 100
+		learner_course_record.isFinished = True
+		learner_course_record.save()
+	else:
+		completeRate = len(lsr_finished)/len(course.section_set.all())
+		learner_course_record.completeRate = completeRate*100
+		learner_course_record.isFinished = False
+		learner_course_record.save()
+
+
 
 @login_required
 def viewglossary(request,course_id):
@@ -676,14 +725,20 @@ def viewsection(request,section_id):
 	
 	learningpath = createlearningpath(section_id)
 
-	if isinstance(learningpath[0], Lecture):
-		learner_lecture_record, created = Learner_Lecture_Record.objects.get_or_create(learner=learner,lecture=learningpath[0])
-		learner_lecture_record.save()
-	elif isinstance(learningpath[0], Quiz):
-		learner_quiz_record, created = Learner_Quiz_Record.objects.get_or_create(learner=learner,quiz=learningpath[0])
-		learner_quiz_record.save()
+	print(learningpath)
+
+	for item in learningpath:
+		if isinstance(item, Lecture):
+			learner_lecture_record, created = Learner_Lecture_Record.objects.get_or_create(learner=learner,lecture=item)
+			learner_lecture_record.save()
+		elif isinstance(item, Quiz):
+			learner_quiz_record, created = Learner_Quiz_Record.objects.get_or_create(learner=learner,quiz=item)
+			learner_quiz_record.save()
 
 	lir,lir_finished = pathitemstate(section.id,learner)
+
+	print(lir)
+	print(lir_finished)
 
 	try:
 		try:
@@ -711,8 +766,13 @@ def sectionfinishcheck(request,section_id):
 	learningpath = createlearningpath(section.id)
 
 	if len(lir_finished) == len(learningpath):
-		print(learner_section_record.id)
 		learner_section_record.isFinished = True
+		learner_section_record.completeRate = 100
+		learner_section_record.save()
+	else:
+		completeRate = len(lir_finished)/len(learningpath)
+		learner_section_record.completeRate = completeRate*100
+		learner_section_record.isFinished = False
 		learner_section_record.save()
 
 
@@ -736,14 +796,12 @@ def viewlecture(request,lecture_id):
 		
 			lir,lir_finished = pathitemstate(lecture.section.id,learner)
 			if len(lir_finished) == len(learningpath):
-				sectionfinishcheck(request,lecture.section.id)
 				return redirect('viewcourse', course_id=lecture.section.course.id)
 			elif len(lir_finished) != len(learningpath):
 				return redirect('viewsection', section_id=lecture.section.id)
 		elif 'finish_lecture' in request.POST:
 			learner_lecture_record.isFinished = True
 			learner_lecture_record.save()
-			sectionfinishcheck(request,lecture.section.id)
 			if isinstance(learningpath[lecture_index + 1 ], Lecture):
 				return redirect('viewlecture', lecture_id=learningpath[lecture_index + 1].id)
 			elif isinstance(learningpath[lecture_index + 1 ], Quiz):
@@ -788,7 +846,6 @@ def viewquiz(request,quiz_id):
 
 			lir,lir_finished = pathitemstate(quiz.section.id,learner)
 			if len(lir_finished) == len(learningpath):
-				sectionfinishcheck(request,quiz.section.id)
 				return redirect('viewcourse', course_id=quiz.section.course.id)
 			elif len(lir_finished) != len(learningpath):
 				return redirect('viewsection', section_id=quiz.section.id)
@@ -797,7 +854,6 @@ def viewquiz(request,quiz_id):
 			if successrate >= quiz.successrate:
 				learner_quiz_record.isFinished = True
 				learner_quiz_record.save()
-				sectionfinishcheck(request,quiz.section.id)
 				if isinstance(learningpath[quiz_index + 1 ], Lecture):
 					return redirect('viewlecture', lecture_id=learningpath[quiz_index + 1].id)
 				elif isinstance(learningpath[quiz_index + 1 ], Quiz):
@@ -831,7 +887,7 @@ def pathitemstate(section_id,learner):
 
 	lectures = Lecture.objects.filter(section= section_id)
 	quizes = Quiz.objects.filter(section=section_id)
-	
+
 	#learner_lecture_record
 	llr = list()
 	llr_finished= list()

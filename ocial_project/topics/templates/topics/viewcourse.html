@@ -16,27 +16,51 @@
         </div>
     </div>
 
-    {% for section in course.section_set.all %}
+
+    {% for learner_section_record in lsr_all %}
+
+
 
     <div class="card mb-3">
 
         <div class="card-header">
-            Section {{section.order}} {%if section in lsr_finished %}
-<i class="fas fa-check" style="color:green;"></i>{%endif%}
+            Section {{learner_section_record.section.order}} 
+            {%if learner_section_record.section in lsr_finished %}
+            <i class="fas fa-check" style="color:green;"></i>
+            {%endif%}
         </div>
         <div class="card-body">
-            <h5 class="card-title">{{section.name}}</h5>
-            <p class="card-text">{{section.description}}</p>
-                {%if section in lsr %}
-                <a href="{% url 'viewsection' section.id %}" class="btn btn-danger">Resume Section</a>
-                {%elif section in lsr_finished %}
-                <a href="{% url 'viewsection' section.id %}" class="btn btn-danger">View Section</a>
+            <h5 class="card-title">{{learner_section_record.section.name}}</h5>
+            <p class="card-text">{{learner_section_record.section.description}}</p>
+                {%if learner_section_record.section in lsr %}
+                <a href="{% url 'viewsection' learner_section_record.section.id %}" class="btn btn-danger">Resume Section</a>
+                {%elif learner_section_record.section in lsr_finished %}
+                <a href="{% url 'viewsection' learner_section_record.section.id %}" class="btn btn-danger">View Section</a>
                 {%else%}
-                <a href="{% url 'viewsection' section.id %}" class="btn btn-danger">Start Section</a>
+                <a href="{% url 'viewsection' learner_section_record.section.id %}" class="btn btn-danger">Start Section</a>
                 {%endif%}
+
+            <br />
+            <br />
+
+            {%if learner_section_record.section in lsr_finished %}
+
+            <div class="progress">
+             <div class="progress-bar bg-success" role="progressbar" style="width: {{learner_section_record.completeRate}}%;" aria-valuenow="{{learner_section_record.completeRate}}" aria-valuemin="0" aria-valuemax="100">{{learner_section_record.completeRate}}% Completed</div>
+            </div>
+
+            {%else%}
+
+            <div class="progress">
+             <div class="progress-bar bg-warning" role="progressbar" style="width: {{learner_section_record.completeRate}}%;" aria-valuenow="{{learner_section_record.completeRate}}" aria-valuemin="0" aria-valuemax="100">{{learner_section_record.completeRate}}%</div>
+            </div>
+            {%endif%}
         </div>
     </div>
     {% endfor %}
+
+    <a href="{% url 'learner' %}" style="float:right; margin-bottom: 100px;" class="btn btn-danger">Exit Course</a>
+
 
 </div>
 

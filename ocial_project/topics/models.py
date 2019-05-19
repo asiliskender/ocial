@@ -47,6 +47,7 @@ class Learner_Course_Record(models.Model):
     learner = models.ForeignKey(Learner, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     isFinished = models.BooleanField(default=False)
+    completeRate = models.IntegerField(default= 0)
 
     def __str__(self):
         return self.learner.user.username + " - " +self.course.title
@@ -80,6 +81,7 @@ class Learner_Section_Record(models.Model):
     learner = models.ForeignKey(Learner, on_delete=models.CASCADE)
     section = models.ForeignKey(Section, on_delete=models.CASCADE)
     isFinished = models.BooleanField(default=False)
+    completeRate = models.IntegerField(default = 0)
 
     def __str__(self):
         return self.learner.user.username + " - " +self.section.name
