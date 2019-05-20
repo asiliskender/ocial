@@ -9,6 +9,11 @@
             </div>
             <div class="col-md-8 ">
                 <div class="card-body ">
+                    {%if course.published == True%}
+                    <small>Published</small>
+                    {%else%}
+                    <small>Saved</small>
+                    {%endif%}
                     <a href="{% url 'editcourse' course.id %} "><h5 class="card-title ">{{ course.title }}</h5></a>
                     <p class="card-text ">{{ course.summary }}</p>
                     <p class="card-text "><small class="text-muted "><a href="{%url 'exploretopic' course.topic.id %}">{{ course.topic }}</a></small></p>

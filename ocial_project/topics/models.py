@@ -23,6 +23,8 @@ class Course(models.Model):
 	label = models.ManyToManyField('Label', blank=True)
 	published = models.BooleanField(default=False)
 	course_learner = models.ManyToManyField(Learner, blank=True,through='Learner_Course_Record')
+	isPublishable = models.BooleanField(default=False)
+
 
 	def pub_date_exact(self):
 		return self.pubdate.strftime('%e %B %Y %H:%M')
@@ -70,6 +72,8 @@ class Section(models.Model):
 	description = models.TextField(blank=True)
 	section_learner = models.ManyToManyField(Learner, blank=True,through='Learner_Section_Record')
 	isLinked = models.BooleanField(default=False)
+	isPublishable = models.BooleanField(default=False)
+
 
 	class Meta:
 		ordering = ['order']

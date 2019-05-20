@@ -172,6 +172,8 @@
                     <br /> {% endif %}
 
                     <button type="submit" name="save_section" id="save_section" class="btn btn-danger btn-block"><i class="far fa-save"></i> Save</button>
+
+                    <button type="submit" name="save_exit_section" id="save_exit_section" class="btn btn-danger btn-block">Save and Exit</button>
                     {% if section.id %}
                     <button type="submit" name="submit_section" id="submit_section" class="btn btn-danger btn-block">Submit</button>
 
@@ -190,6 +192,10 @@
         });
 
         document.getElementById("save_section").onclick = function() {
+            sendLPOrder()
+        };
+
+        document.getElementById("save_exit_section").onclick = function() {
             sendLPOrder()
         };
         document.getElementById("submit_section").onclick = function() {

@@ -132,6 +132,7 @@ def editcourse(request,course_id):
 	topics = Topic.objects.all()
 	teacher = course.teacher
 	if request.method == 'POST':
+		savecourse(request,course)
 		if 'addglossary' in request.POST:
 			return redirect('glossary', course_id=course.id)
 		if 'newsection' in request.POST:
@@ -157,12 +158,19 @@ def editcourse(request,course_id):
 			else:
 				return render(request, 'topics/editcourse.html', {'teacher':teacher,'topics': topics , 'course': course, 'error': 'Title and Topic fields are required'})
 		
+		if 'save_exit' in request.POST:
+			if request.POST['title'] and request.POST.getlist('topic'):
+				savecourse(request,course)
+				return redirect('teacher')
+			else:
+				return render(request, 'topics/editcourse.html', {'topics': topics , 'course': course, 'error': 'Title and Topic fields are required'})	
 		if 'publish' in request.POST:
 			if request.POST['title'] and request.POST.getlist('topic'):
 				savecourse(request,course)
-				course.published = True
-				course.save()
-				return redirect('teacher')
+				if course.published == True:
+					return redirect('teacher')
+				else:
+					return render(request, 'topics/editcourse.html', {'topics': topics , 'course': course, 'error': 'One of the sections is not submitted.'})	
 			else:
 				return render(request, 'topics/editcourse.html', {'topics': topics , 'course': course, 'error': 'Title and Topic fields are required'})	
 		return render(request, 'topics/editcourse.html',{'teacher':teacher,'topics': topics ,'course': course},)
@@ -189,8 +197,23 @@ def savecourse(request,course):
 	labels = request.POST['labels']
 	labels = labels.split(",")
 
+	if course.section_set.all():
+		for section in course.section_set.all():
+			if section.isPublishable == True:
+				course.isPublishable = True
+			else:
+				course.isPublishable = False
+				break
+
 	course.save()
 
+	if course.isPublishable == True:
+		course.published = True
+	else:
+		course.published = False
+
+	course.save()
+			
 
 	if request.POST['labels']:
 		for label in labels:
@@ -315,16 +338,26 @@ def editsection(request,section_id):
 
 
 	if request.method == 'POST':
+		savesection(request,section)
 		if 'save_section' in request.POST:
 			if request.POST['sectionname']:
 				savesection(request,section)
 				return redirect('editsection', section_id=section.id)
 			else:
 				return render(request, 'topics/editsection.html', {'teacher':teacher,'section': section, 'error': 'Name field is required'})		
-		if 'submit_section' in request.POST:
+		if 'save_exit_section' in request.POST:
 			if request.POST['sectionname']:
 				savesection(request,section)
 				return redirect('editcourse', course_id=section.course.id)
+			else:
+				return render(request, 'topics/editsection.html', {'teacher':teacher,'section': section, 'error': 'Name field is required'})
+		if 'submit_section' in request.POST:
+			if request.POST['sectionname']:
+				savesection(request,section)
+				if section.isPublishable == True:
+					return redirect('editcourse', course_id=section.course.id)
+				else:
+					return render(request, 'topics/editsection.html', {'teacher':teacher,'section': section, 'error': 'Section does not have lecture or quiz.'})
 			else:
 				return render(request, 'topics/editsection.html', {'teacher':teacher,'section': section, 'error': 'Name field is required'})
 		if 'addresource' in request.POST:
@@ -366,6 +399,11 @@ def savesection(request,section):
 	section.name = request.POST['sectionname']
 	section.description = request.POST['sectiondescription']
 
+	if section.lecture_set.all() or section.quiz_set.all():
+		section.isPublishable = True
+	else:
+		section.isPublishable = False
+	
 	if 'sectionislinked' in request.POST:
 		section.isLinked = True
 	else:

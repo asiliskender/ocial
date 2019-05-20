@@ -91,7 +91,11 @@
                         <ul class="grid">
 
                             {% for section in course.section_set.all %}
-                            <li class="item" data-id={{section.id}}><a href="{% url 'editsection' section.id %}">Section {{section.order}}: {{section.name}}</a>
+                            <li class="item" data-id={{section.id}}><a href="{% url 'editsection' section.id %}">Section {{section.order}}: {{section.name}}</a> 
+
+                                {%if section.isPublishable == True%}
+                                <i class="fas fa-check" style="color:green;"></i> 
+                                {%endif%}
 
                                 <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletesection' section.id %}';" class="btn btn-pill btn-outline-danger"><i class="far fa-trash-alt"></i></button>
 
@@ -166,11 +170,15 @@
 
                     <br />
 
-                    <button type="submit" name="save" id="save" class="btn btn-danger"><i class="far fa-save"></i> Save</button>
-                    {% if course.id %}
-                    <button type="submit" name="publish" id="publish" class="btn btn-danger">Publish</button>
+                    <button type="submit" name="save" id="save" class="btn btn-danger btn-block"><i class="far fa-save"></i> Save</button>
 
-                    <button type="button" onclick="window.location.href='{% url 'deletecourse' course.id %}';" class="btn btn-outline-danger"><i class="far fa-trash-alt"></i> Delete</button>
+                    <button type="submit" name="save_exit" id="save_exit" class="btn btn-danger btn-block"> Save and Exit</button>
+                    {% if course.id %}
+
+                    <button type="submit" name="publish" id="publish" class="btn btn-danger btn-block">Publish</button>
+
+                    <button type="button" onclick="window.location.href='{% url 'deletecourse' course.id %}';" class="btn btn-outline-danger btn-block"><i class="far fa-trash-alt"></i> Delete</button>
+
 
                     {% endif %}
                 </div>
@@ -185,6 +193,10 @@
         });
 
         document.getElementById("save").onclick = function() {
+            sendSectionOrder()
+        };
+
+        document.getElementById("save_exit").onclick = function() {
             sendSectionOrder()
         };
         document.getElementById("publish").onclick = function() {
