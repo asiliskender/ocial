@@ -342,12 +342,19 @@ def editsection(request,section_id):
 	learningpath = getlearningpath(section_id)
 	teacher = section.course.teacher
 
-	if section.lecture_set.all() or section.quiz_set.all():
+	if section.quiz_set.all() or section.lecture_set.all():
 		section.isPublishable = True
-		section.save()
+		if section.quiz_set.all():
+			for quiz in section.quiz_set.all():
+				if quiz.isPublishable == True:
+					section.isPublishable = True
+				else:
+					section.isPublishable = False
+					break
+		else:
+			section.isPublishable = False
 	else:
 		section.isPublishable = False
-		section.save()
 
 
 	if request.method == 'POST':
@@ -370,7 +377,7 @@ def editsection(request,section_id):
 				if section.isPublishable == True:
 					return redirect('editcourse', course_id=section.course.id)
 				else:
-					return render(request, 'topics/editsection.html', {'teacher':teacher,'section': section, 'error': 'Section does not have lecture or quiz.'})
+					return render(request, 'topics/editsection.html', {'teacher':teacher,'section': section, 'error': 'Not all quizzes or lectures are submitted in this section'})
 			else:
 				return render(request, 'topics/editsection.html', {'teacher':teacher,'section': section, 'error': 'Name field is required'})
 		if 'addresource' in request.POST:
@@ -412,10 +419,21 @@ def savesection(request,section):
 	section.name = request.POST['sectionname']
 	section.description = request.POST['sectiondescription']
 
-	if section.lecture_set.all() or section.quiz_set.all():
+	if section.quiz_set.all() or section.lecture_set.all():
 		section.isPublishable = True
+		if section.quiz_set.all():
+			for quiz in section.quiz_set.all():
+				if quiz.isPublishable == True:
+					section.isPublishable = True
+				else:
+					section.isPublishable = False
+					break
+		else:
+			section.isPublishable = False
 	else:
 		section.isPublishable = False
+
+
 	
 	if 'sectionislinked' in request.POST:
 		section.isLinked = True
@@ -522,7 +540,10 @@ def editquiz(request, quiz_id):
 			if 'submit_quiz' in request.POST:
 				if request.POST['quiztitle']:
 					savequiz(request,quiz)
-					return redirect('editsection', section_id=quiz.section.id)
+					if quiz.isPublishable == True:
+						return redirect('editsection', section_id=quiz.section.id)
+					else:
+						return render(request, 'topics/editquiz.html', {'teacher':teacher,'quiz': quiz, 'error': 'Please submit questions'})		
 				else:
 					return render(request, 'topics/editquiz.html', {'teacher':teacher,'quiz': quiz, 'error': 'Quiz title field is required'})		
 			if 'newquestion' in request.POST:
@@ -544,6 +565,16 @@ def savequiz(request,quiz):
 
 	quiz.title = request.POST['quiztitle']
 	quiz.successrate = request.POST['quizsuccessrate']
+	
+	if quiz.question_set.all():
+		for question in quiz.question_set.all():
+			if question.isPublishable == True:
+				quiz.isPublishable = True
+			else:
+				quiz.isPublishable = False
+				break
+	else:
+		quiz.isPublishable = False
 	quiz.save()
 
 @login_required
@@ -584,9 +615,12 @@ def editquestion(request, question_id):
 			if 'submit_question' in request.POST:
 				if request.POST['questiontitle']:
 					savequestion(request,question)
-					return redirect('editquiz', quiz_id=question.quiz.id)
+					if question.isPublishable == True:
+						return redirect('editquiz', quiz_id=question.quiz.id)
+					else:
+						return render(request, 'topics/editquestion.html', {'teacher':teacher,'question': question, 'error': 'Answers are required'})		
 				else:
-					return render(request, 'topics/editquiz.html', {'teacher':teacher,'quiz': quiz, 'error': 'Quiz title field is required'})		
+					return render(request, 'topics/editquestion.html', {'teacher':teacher,'question': question, 'error': 'Question is required'})		
 			if 'newchoice' in request.POST:
 				if request.POST['choicetitle']:
 					numberofchoices = question.choice_set.count()
@@ -621,6 +655,13 @@ def savequestion(request,question):
 	orderchoice(request)
 
 	question.title = request.POST['questiontitle']
+
+	if question.choice_set.all():
+		question.isPublishable = True
+	else:
+		question.isPublishable = False
+
+
 	question.save()
 
 @login_required
@@ -648,7 +689,6 @@ def orderchoice(request):
 			i += 1
 
 @login_required
-@question_teacher_is_user
 def deletechoice(request,choice_id):
 	choice = get_object_or_404(Choice,pk=choice_id)
 	question_id = choice.question.id

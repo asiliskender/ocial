@@ -119,6 +119,8 @@ class Quiz(models.Model):
 	order =  models.IntegerField(default=1)
 	successrate =  models.IntegerField(default=0)
 	quiz_learner = models.ManyToManyField(Learner, blank=True,through='Learner_Quiz_Record')
+	isPublishable = models.BooleanField(default=False)
+
 
 	class Meta:
 		ordering = ['order']
@@ -139,6 +141,8 @@ class Question(models.Model):
 	title = models.TextField(blank=True)
 	quiz = models.ForeignKey('Quiz', on_delete=models.CASCADE)
 	order =  models.IntegerField(default=1)
+	isPublishable = models.BooleanField(default=False)
+
 
 	class Meta:
 		ordering = ['order']

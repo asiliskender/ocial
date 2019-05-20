@@ -98,15 +98,24 @@
 
                     <ul class="grid">
 
-                        {% for pathitem in learningpath %} {%if pathitem|verbose_name == "Lecture" %}
+                        {% for pathitem in learningpath %} 
+
+                        {%if pathitem|verbose_name == "Lecture" %}
 
                         <li class="item" data-id={{pathitem|verbose_name}}:{{pathitem.id}}><a href="{% url 'editlecture' pathitem.id%}">{{pathitem.order}}. {{pathitem|verbose_name}}: {{pathitem.title}}</a>
+
+                            <i class="fas fa-check" style="color:green;"></i> 
+
 
                             <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletelecture' pathitem.id %}';" class="btn btn-pill btn-outline-danger"><i class="far fa-trash-alt"></i></button>
 
                             {%else%}
 
                             <li class="item" data-id={{pathitem|verbose_name}}:{{pathitem.id}}><a href="{% url 'editquiz' pathitem.id%}">{{pathitem.order}}. {{pathitem|verbose_name}}: {{pathitem.title}}</a>
+
+                                {%if pathitem.isPublishable == True%}
+                                <i class="fas fa-check" style="color:green;"></i> 
+                                {%endif%}
 
                                 <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletequiz' pathitem.id %}';" class="btn btn-pill btn-outline-danger"><i class="far fa-trash-alt"></i></button>
 

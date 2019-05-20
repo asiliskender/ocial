@@ -100,6 +100,10 @@
                             {% for question in quiz.question_set.all %}
                             <li class="item" data-id={{question.id}}><a href="{% url 'editquestion' question.id %}">Question {{question.order}}: {{question.title}}</a>
 
+                                {%if question.isPublishable == True%}
+                                <i class="fas fa-check" style="color:green;"></i> 
+                                {%endif%}
+
                                 <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletequestion' question.id %}';" class="btn btn-pill btn-outline-danger"><i class="far fa-trash-alt"></i></button>
 
                             </li>
