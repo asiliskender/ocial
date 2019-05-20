@@ -802,6 +802,16 @@ def enrollcourse(request,course_id):
 	return redirect('viewcourse', course_id=course_id)
 
 @login_required
+def unenrollcourse(request,course_id):
+	course =  get_object_or_404(Course,pk=course_id, published=True)
+	learner, created = Learner.objects.get_or_create(user=request.user)
+	learner_course_record, created = Learner_Course_Record.objects.get_or_create(learner=learner,course=course)
+	learner_course_record.delete()
+	return redirect('learner')
+
+
+
+@login_required
 def learner(request):
 	learner, created = Learner.objects.get_or_create(user=request.user)
 	learner_course_record = Learner_Course_Record.objects.filter(learner = learner)

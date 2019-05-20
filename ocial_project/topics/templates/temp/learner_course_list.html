@@ -2,12 +2,20 @@
 
    {% for lcr in lcr %}
     
-    <div class="card mb-3" style="max-width: 1200px; max-height: 450px;">
+    <div class="card mb-3" style="max-width: 1200px; max-height: 550px;">
         <div class="row no-gutters">
             <div class="col-md-4" >
-                <img style="object-fit: cover; height: 200px;" src="{{ lcr.course.image.url }}"  class="card-img rounded-0" >
+                <img style="object-fit: cover; height: 230px;" src="{{ lcr.course.image.url }}"  class="card-img rounded-0" >
             </div>
             <div class="col-md-8 ">
+                <div class="card-header">
+
+
+                   <small class="text-muted "><a href="{%url 'exploretopic' lcr.course.topic.id %}">{{ lcr.course.topic }}</a></small>
+                    
+                    <button style="float: right; margin-top: -6px;" type="button" onclick="window.location.href='{% url 'unenrollcourse' lcr.course.id %}';" class="btn btn-pill btn-outline-danger"><i class="far fa-trash-alt"></i> Unenroll</button>
+
+                </div>
                 <div class="card-body ">
                     <a href="{% url 'viewcourse' lcr.course.id %} "><h5 class="card-title ">{{ lcr.course.title }}</h5></a>
                     <p class="card-text ">{{ lcr.course.summary }}</p>
@@ -25,9 +33,6 @@
                     </div>
                     {%endif%}
 
-
-
-                    <p class="card-text "><small class="text-muted "><a href="{%url 'exploretopic' lcr.course.topic.id %}">{{ lcr.course.topic }}</a></small></p>
                 </div>
             </div>
         </div>
