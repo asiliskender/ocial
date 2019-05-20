@@ -160,7 +160,16 @@
                         <button type="submit" name="save_question" id="save_question" class="btn btn-danger btn-block"><i class="far fa-save"></i> Save</button>
 
                         {% if question.id %}
+
+                        {%if question.isPublishable == True%}
+
                         <button type="submit" name="submit_question" id="submit_question" class="btn btn-danger btn-block">Submit</button>
+
+                        {%else%}
+
+                        <button type="submit" name="save_exit_question" id="save_exit_question" class="btn btn-danger btn-block">Save and Exit</button>
+
+                         {%endif%}
 
                         <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletequestion' question.id %}';" class="btn btn-block btn-outline-danger" style="margin-bottom: 5px;"><i class="far fa-trash-alt"></i> Delete Question</button>
 
@@ -180,6 +189,10 @@
         });
 
         document.getElementById("save_question").onclick = function() {
+            sendQuestionOrder()
+        };
+
+        document.getElementById("save_exit_question").onclick = function() {
             sendQuestionOrder()
         };
         document.getElementById("submit_question").onclick = function() {

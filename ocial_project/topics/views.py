@@ -528,11 +528,27 @@ def editquiz(request, quiz_id):
 	quiz =  get_object_or_404(Quiz,pk=quiz_id)
 	teacher = quiz.section.course.teacher
 
+	if quiz.question_set.all():
+		for question in quiz.question_set.all():
+			if question.isPublishable == True:
+				quiz.isPublishable = True
+			else:
+				quiz.isPublishable = False
+				break
+	else:
+		quiz.isPublishable = False
+
 	if request.method == 'POST':
 			if 'save_quiz' in request.POST:
 				if request.POST['quiztitle']:
 					savequiz(request,quiz)
 					return redirect('editquiz', quiz_id=quiz.id)
+				else:
+					return render(request, 'topics/editquiz.html', {'teacher':teacher,'quiz': quiz, 'error': 'Quiz title field is required'})		
+			if 'save_exit_quiz' in request.POST:
+				if request.POST['quiztitle']:
+					savequiz(request,quiz)
+					return redirect('editsection', section_id=quiz.section.id)
 				else:
 					return render(request, 'topics/editquiz.html', {'teacher':teacher,'quiz': quiz, 'error': 'Quiz title field is required'})		
 			if 'submit_quiz' in request.POST:
@@ -603,6 +619,11 @@ def editquestion(request, question_id):
 	question =  get_object_or_404(Question,pk=question_id)
 	teacher = question.quiz.section.course.teacher
 
+	if question.choice_set.all():
+		question.isPublishable = True
+	else:
+		question.isPublishable = False
+
 	if request.method == 'POST':
 			if 'save_question' in request.POST:
 				if request.POST['questiontitle']:
@@ -610,6 +631,12 @@ def editquestion(request, question_id):
 					return redirect('editquestion', question_id=question.id)
 				else:
 					return render(request, 'topics/editquiz.html', {'teacher':teacher,'quiz': quiz, 'error': 'Quiz title field is required'})		
+			if 'save_exit_question' in request.POST:
+				if request.POST['questiontitle']:
+					savequestion(request,question)
+					return redirect('editquiz', quiz_id=question.quiz.id)
+				else:
+					return render(request, 'topics/editquestion.html', {'teacher':teacher,'question': question, 'error': 'Question is required'})		
 			if 'submit_question' in request.POST:
 				if request.POST['questiontitle']:
 					savequestion(request,question)

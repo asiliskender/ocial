@@ -132,7 +132,16 @@
                     <button type="submit" name="save_quiz" id="save_quiz" class="btn btn-danger btn-block"><i class="far fa-save"></i> Save</button>
 
                     {% if quiz.id %}
+                    
+                    {%if quiz.isPublishable == True%}
+
                     <button type="submit" name="submit_quiz" id="submit_quiz" class="btn btn-danger btn-block">Submit</button>
+
+                    {%else%}
+
+                    <button type="submit" name="save_exit_quiz" id="save_exit_quiz" class="btn btn-danger btn-block">Save and Exit</button>
+
+                    {%endif%}
 
                     <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletequiz' quiz.id %}';" class="btn btn-block btn-outline-danger" style="margin-bottom: 5px;"><i class="far fa-trash-alt"></i> Delete Quiz</button>
 
