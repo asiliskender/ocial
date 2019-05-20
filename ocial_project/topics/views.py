@@ -351,8 +351,6 @@ def editsection(request,section_id):
 				else:
 					section.isPublishable = False
 					break
-		else:
-			section.isPublishable = False
 	else:
 		section.isPublishable = False
 
@@ -427,11 +425,11 @@ def savesection(request,section):
 					section.isPublishable = True
 				else:
 					section.isPublishable = False
+					print("1")
 					break
-		else:
-			section.isPublishable = False
 	else:
 		section.isPublishable = False
+		print("3")
 
 
 	
