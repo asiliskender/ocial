@@ -425,11 +425,9 @@ def savesection(request,section):
 					section.isPublishable = True
 				else:
 					section.isPublishable = False
-					print("1")
 					break
 	else:
 		section.isPublishable = False
-		print("3")
 
 
 	
@@ -844,8 +842,6 @@ def viewsection(request,section_id):
 	
 	learningpath = createlearningpath(section_id)
 
-	print(learningpath)
-
 	for item in learningpath:
 		if isinstance(item, Lecture):
 			learner_lecture_record, created = Learner_Lecture_Record.objects.get_or_create(learner=learner,lecture=item)
@@ -856,8 +852,6 @@ def viewsection(request,section_id):
 
 	lir,lir_finished = pathitemstate(section.id,learner)
 
-	print(lir)
-	print(lir_finished)
 
 	try:
 		try:
@@ -941,28 +935,30 @@ def viewquiz(request,quiz_id):
 
 	quiz_index = learningpath.index(quiz)
 
+	givenanswers = list()
+	correctanswers = list()
+
 
 	if request.method == 'POST':
+		print(request.POST)
 		questions = quiz.question_set.all()
 		number_of_questions = len(questions)
 		successrate = 0
 		for question in questions:
+			choices = question.choice_set.all()
+			for choice in choices:
+				if choice.isTrue == True:
+					correctanswers.append(choice)
 			choice_question_id = "choice-radio-"+ str(question.id)
 			if choice_question_id in request.POST:
 				answer_id = request.POST[choice_question_id]
 				answer =  get_object_or_404(Choice,pk=answer_id)
+				givenanswers.append(answer)
 				if answer.isTrue == True:
 					successrate += (1/number_of_questions)*100
 					successrate = int(successrate)
 
 		if 'finish_section' in request.POST:
-			if successrate >= quiz.successrate:
-				learner_quiz_record.isFinished = True
-				learner_quiz_record.save()
-			elif successrate < quiz.successrate:
-				error = "Quiz Passing Criteria is " + str(quiz.successrate) + ". Your score is " + str(successrate) +"."
-				return render(request, 'topics/viewquiz.html',{'learner':learner,'quiz': quiz, 'learningpath':learningpath, 'lir':lir, 'lir_finished':lir_finished, 'error': error})
-
 			lir,lir_finished = pathitemstate(quiz.section.id,learner)
 			if len(lir_finished) == len(learningpath):
 				return redirect('viewcourse', course_id=quiz.section.course.id)
@@ -970,19 +966,24 @@ def viewquiz(request,quiz_id):
 				return redirect('viewsection', section_id=quiz.section.id)
 
 		elif 'finish_quiz' in request.POST:
+			if isinstance(learningpath[quiz_index + 1 ], Lecture):
+				return redirect('viewlecture', lecture_id=learningpath[quiz_index + 1].id)
+			elif isinstance(learningpath[quiz_index + 1 ], Quiz):
+				return redirect('viewquiz', quiz_id=learningpath[quiz_index + 1].id)
+
+		elif 'complete_quiz' in request.POST:
 			if successrate >= quiz.successrate:
 				learner_quiz_record.isFinished = True
 				learner_quiz_record.save()
-				if isinstance(learningpath[quiz_index + 1 ], Lecture):
-					return redirect('viewlecture', lecture_id=learningpath[quiz_index + 1].id)
-				elif isinstance(learningpath[quiz_index + 1 ], Quiz):
-					return redirect('viewquiz', quiz_id=learningpath[quiz_index + 1].id)
+				message = "Quiz Passing Criteria is " + str(quiz.successrate) + ". Your score is " + str(successrate) +"."
+				return render(request, 'topics/viewquiz.html',{'learner':learner,'quiz': quiz, 'learningpath':learningpath, 'lir':lir, 'lir_finished':lir_finished, 'message': message, 'givenanswers':givenanswers, 'correctanswers':correctanswers})
 			elif successrate < quiz.successrate:
 				error = "Quiz Passing Criteria is " + str(quiz.successrate) + ". Your score is " + str(successrate) +"."
 				return render(request, 'topics/viewquiz.html',{'learner':learner,'quiz': quiz, 'learningpath':learningpath, 'lir':lir, 'lir_finished':lir_finished, 'error': error})
 
 
 	return render(request, 'topics/viewquiz.html',{'learner':learner,'quiz': quiz, 'learningpath':learningpath, 'lir':lir, 'lir_finished':lir_finished})
+
 
 def createlearningpath(section_id):
 	lectures = Lecture.objects.filter(section= section_id)

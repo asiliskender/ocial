@@ -29,10 +29,4 @@ urlpatterns = [
     path('viewlecture/<int:lecture_id>/', views.viewlecture, name = 'viewlecture'),
     path('viewquiz/<int:quiz_id>/', views.viewquiz, name = 'viewquiz'),
 
-
-
-
-
-
-
 ]
