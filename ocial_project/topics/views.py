@@ -12,6 +12,8 @@ from itertools import chain
 from django.core.files import File
 from django.core.files.base import ContentFile
 from .decorators import *
+from django.contrib.auth.hashers import check_password
+
 
 def home(request):
 	topics = Topic.objects.annotate(number_of_courses=Count('course')) 
@@ -99,6 +101,73 @@ def coursedetail(request, course_id):
 def classroom(request):
 	courses = Course.objects.filter(teacher=request.user)
 	return render(request, 'topics/classroom.html',{'courses': courses })
+
+@login_required
+def profile(request):
+	profile_owner = request.user
+
+	if request.method == 'POST':
+		if request.POST['username'] and request.POST['email']:
+			try:
+				user = User.objects.get(username = request.POST['username'])
+				if user == profile_owner:
+					profile_owner.username = request.POST['username']
+					profile_owner.first_name = request.POST['firstname']
+					profile_owner.last_name = request.POST['lastname']
+					profile_owner.email = request.POST['email']
+					profile_owner.save()
+					return render(request, 'topics/profile.html',{'profile_owner': profile_owner})
+				else:
+					return render(request, 'topics/profile.html', {'profile_owner': profile_owner,'error': 'Username has already been taken'})
+			except:
+				try:
+					user = User.objects.get(email = request.POST['email'])
+					if user == profile_owner:
+						profile_owner.username = request.POST['username']
+						profile_owner.first_name = request.POST['firstname']
+						profile_owner.last_name = request.POST['lastname']
+						profile_owner.email = request.POST['email']
+						profile_owner.save()
+						return render(request, 'topics/profile.html',{'profile_owner': profile_owner})
+					else:
+						return render(request, 'topics/profile.html', {'profile_owner': profile_owner,'error': 'E-Mail is used by other user.'})
+				except:
+						profile_owner.username = request.POST['username']
+						profile_owner.first_name = request.POST['firstname']
+						profile_owner.last_name = request.POST['lastname']
+						profile_owner.email = request.POST['email']
+						profile_owner.save()
+						return render(request, 'topics/profile.html',{'profile_owner': profile_owner})
+		else:
+			return render(request, 'topics/profile.html', {'profile_owner': profile_owner,'error': 'Username or E-Mail cannot be empty.'})
+	else:
+		return render(request, 'topics/profile.html',{'profile_owner': profile_owner})
+
+@login_required
+def changepassword(request):
+	profile_owner = request.user
+	currentpassword= request.user.password
+
+	if request.method == 'POST':
+		if request.POST['oldpassword'] and request.POST['password'] and request.POST['password2']:
+			currentpasswordentered = request.POST['oldpassword']
+			matchcheck= check_password(currentpasswordentered, currentpassword)
+			if matchcheck:
+				if request.POST['password'] == request.POST['password2']:
+					profile_owner.set_password(request.POST['password'])
+					profile_owner.save()
+				else:
+					return render(request, 'topics/changepassword.html',{'profile_owner': profile_owner, 'error': 'New password is not confirmed.'})
+			else:
+				return render(request, 'topics/changepassword.html',{'profile_owner': profile_owner, 'error': 'Old password is wrong.'})
+		else:
+			return render(request, 'topics/changepassword.html',{'profile_owner': profile_owner, 'error': 'All fields are required.'})
+
+
+
+
+	return render(request, 'topics/changepassword.html',{'profile_owner': profile_owner})
+
 
 @login_required
 def teacher(request):

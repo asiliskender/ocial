@@ -29,7 +29,6 @@ def signup(request):
 			else:
 				return render(request, 'accounts/signup.html', {'error': 'Password must match'})
 		else:
-			print(request.POST)
 			return render(request, 'accounts/signup.html', {'error': 'Username, E-Mail or Password cannot be empty.'})
 	else:
 		return render(request, 'accounts/signup.html')
