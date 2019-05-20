@@ -173,9 +173,13 @@
                     <button type="submit" name="save" id="save" class="btn btn-danger btn-block"><i class="far fa-save"></i> Save</button>
 
                     <button type="submit" name="save_exit" id="save_exit" class="btn btn-danger btn-block"> Save and Exit</button>
+                    
                     {% if course.id %}
 
+                    {% if course.isPublishable == True %}
                     <button type="submit" name="publish" id="publish" class="btn btn-danger btn-block">Publish</button>
+                    {% endif %}
+
 
                     <button type="button" onclick="window.location.href='{% url 'deletecourse' course.id %}';" class="btn btn-outline-danger btn-block"><i class="far fa-trash-alt"></i> Delete</button>
 

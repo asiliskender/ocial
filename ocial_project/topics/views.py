@@ -131,6 +131,16 @@ def editcourse(request,course_id):
 	course =  get_object_or_404(Course,pk=course_id) 
 	topics = Topic.objects.all()
 	teacher = course.teacher
+
+	if course.section_set.all():
+		for section in course.section_set.all():
+			if section.isPublishable == True:
+				course.isPublishable = True
+			else:
+				course.isPublishable = False
+				break
+	course.save()
+
 	if request.method == 'POST':
 		savecourse(request,course)
 		if 'addglossary' in request.POST:
@@ -157,7 +167,6 @@ def editcourse(request,course_id):
 				return redirect('editcourse', course_id=course.id)
 			else:
 				return render(request, 'topics/editcourse.html', {'teacher':teacher,'topics': topics , 'course': course, 'error': 'Title and Topic fields are required'})
-		
 		if 'save_exit' in request.POST:
 			if request.POST['title'] and request.POST.getlist('topic'):
 				savecourse(request,course)
@@ -167,9 +176,13 @@ def editcourse(request,course_id):
 		if 'publish' in request.POST:
 			if request.POST['title'] and request.POST.getlist('topic'):
 				savecourse(request,course)
-				if course.published == True:
+				if course.isPublishable == True:
+					course.published = True
+					course.save()
 					return redirect('teacher')
 				else:
+					course.published = False
+					course.save()
 					return render(request, 'topics/editcourse.html', {'topics': topics , 'course': course, 'error': 'One of the sections is not submitted.'})	
 			else:
 				return render(request, 'topics/editcourse.html', {'topics': topics , 'course': course, 'error': 'Title and Topic fields are required'})	
@@ -203,18 +216,11 @@ def savecourse(request,course):
 				course.isPublishable = True
 			else:
 				course.isPublishable = False
+				course.published = False
 				break
 
 	course.save()
-
-	if course.isPublishable == True:
-		course.published = True
-	else:
-		course.published = False
-
-	course.save()
 			
-
 	if request.POST['labels']:
 		for label in labels:
 			newlabel , created = Label.objects.get_or_create(name = label)
@@ -335,6 +341,13 @@ def editsection(request,section_id):
 	section =  get_object_or_404(Section,pk=section_id)
 	learningpath = getlearningpath(section_id)
 	teacher = section.course.teacher
+
+	if section.lecture_set.all() or section.quiz_set.all():
+		section.isPublishable = True
+		section.save()
+	else:
+		section.isPublishable = False
+		section.save()
 
 
 	if request.method == 'POST':

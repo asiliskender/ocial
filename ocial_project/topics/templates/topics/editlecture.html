@@ -48,6 +48,8 @@
                     <button type="submit" name="save_lecture" class="btn btn-danger btn-block"><i class="far fa-save"></i> Save</button>
 
                     {% if lecture.id %}
+
+                    
                     <button type="submit" name="submit_lecture" class="btn btn-danger btn-block">Submit</button>
 
                     <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletelecture' lecture.id %}';" class="btn btn-block btn-outline-danger" style="margin-bottom: 5px;"><i class="far fa-trash-alt"></i> Delete Lecture</button>

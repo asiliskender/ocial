@@ -173,9 +173,19 @@
 
                     <button type="submit" name="save_section" id="save_section" class="btn btn-danger btn-block"><i class="far fa-save"></i> Save</button>
 
-                    <button type="submit" name="save_exit_section" id="save_exit_section" class="btn btn-danger btn-block">Save and Exit</button>
+                    
                     {% if section.id %}
+
+                    {% if section.isPublishable == True %}
+
                     <button type="submit" name="submit_section" id="submit_section" class="btn btn-danger btn-block">Submit</button>
+
+                    {%else%}
+
+                    <button type="submit" name="save_exit_section" id="save_exit_section" class="btn btn-danger btn-block">Save and Exit</button>
+
+                    {% endif %}
+
 
                     <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletesection' section.id %}';" class="btn btn-block btn-outline-danger" style="margin-bottom: 5px;"><i class="far fa-trash-alt"></i> Delete Section</button>
 
