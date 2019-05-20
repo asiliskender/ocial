@@ -574,6 +574,8 @@ def editquiz(request, quiz_id):
 		return render(request, 'topics/editquiz.html',{'teacher':teacher,'quiz': quiz})
 
 def savequiz(request,quiz):
+
+	print(request.POST)
 	
 	orderquestion(request)
 
@@ -596,7 +598,6 @@ def orderquestion(request):
 	if request.POST['question-order']:
 		order_array = request.POST['question-order']
 		order_array = order_array.split(',')
-		print(order_array)
 
 		i = 1
 		for question_id in order_array:
@@ -745,13 +746,15 @@ def learner(request):
 
 	lcr = list()
 	for learner_cr in learner_course_record:
-		lcr.append(learner_cr)
+		if learner_cr.course.published == True:
+			lcr.append(learner_cr)
 
 	lcr_finished = list()
 	for learner_cr in learner_course_record:
 		coursefinishcheck(request,learner_cr.course.id)
 		if learner_cr.isFinished == True:
-			lcr_finished.append(learner_cr)
+			if learner_cr.course.published == True:
+				lcr_finished.append(learner_cr)
 
 	return render(request, 'topics/learner.html',{'learner': learner, 'lcr':lcr, 'lcr_finished':lcr_finished })
 

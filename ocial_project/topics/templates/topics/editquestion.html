@@ -161,7 +161,7 @@
 
                         {% if question.id %}
 
-                        {%if question.isPublishable == True%}
+                        {% if question.isPublishable == True %}
 
                         <button type="submit" name="submit_question" id="submit_question" class="btn btn-danger btn-block">Submit</button>
 
@@ -192,12 +192,11 @@
             sendQuestionOrder()
         };
 
-        document.getElementById("save_exit_question").onclick = function() {
-            sendQuestionOrder()
-        };
         document.getElementById("submit_question").onclick = function() {
             sendQuestionOrder()
         };
+
+
 
         function sendQuestionOrder() {
 
@@ -206,6 +205,14 @@
             choiceorder.form.submit();
 
         }
+    </script>
+
+    <script type="text/javascript">
+        
+        document.getElementById("save_exit_question").onclick = function() {
+            sendQuestionOrder()
+        };
+        
     </script>
 
     </div>

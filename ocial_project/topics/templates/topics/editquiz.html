@@ -163,9 +163,11 @@
         document.getElementById("save_quiz").onclick = function() {
             sendQuestionOrder()
         };
-        document.getElementById("submit_quiz").onclick = function() {
+
+                document.getElementById("submit_quiz").onclick = function() {
             sendQuestionOrder()
         };
+
 
         function sendQuestionOrder() {
 
@@ -174,6 +176,16 @@
             questionorder.form.submit();
 
         }
+
+    </script>
+
+    <script type="text/javascript">
+
+
+        document.getElementById("save_exit_quiz").onclick = function() {
+            sendQuestionOrder()
+        };
+
     </script>
 
 </div>
