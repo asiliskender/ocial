@@ -181,8 +181,12 @@ def newcourse(request):
 	topics = Topic.objects.all()
 	if request.method == 'POST':
 		if 'newtopic' in request.POST:
-			topic , created = Topic.objects.get_or_create(title=request.POST['topictitle'])
-			topic.save()
+			try:
+				topic = Topic.objects.get(title__iexact=request.POST['topictitle'])
+			except:
+				topic = Topic()
+				topic.title = request.POST['topictitle']
+				topic.save()
 			return redirect('newcourse')
 		if 'save' in request.POST:
 			if request.POST['title'] and request.POST.getlist('topic'):
@@ -211,10 +215,11 @@ def editcourse(request,course_id):
 	course.save()
 
 	if request.method == 'POST':
+		print(request.POST)
 		savecourse(request,course)
 		if 'addglossary' in request.POST:
 			return redirect('glossary', course_id=course.id)
-		if 'newsection' in request.POST:
+		elif 'newsection' in request.POST:
 			numberofsections = course.section_set.count()
 			section = Section()
 			section.name = request.POST['sectionname']
@@ -222,27 +227,30 @@ def editcourse(request,course_id):
 			section.order = numberofsections +1
 			section.save()
 			return redirect('editsection', section_id=section.id)
-		if 'newtopic' in request.POST:
-			topic , created = Topic.objects.get_or_create(title=request.POST['topictitle'])
-			topic.save()
+		elif 'newtopic' in request.POST:
+			try:
+				topic = Topic.objects.get(title__iexact=request.POST['topictitle'])
+			except:
+				topic = Topic()
+				topic.title = request.POST['topictitle']
+				topic.save()
 			savecourse(request,course)
 			course.topic  = topic
 			course.save()
 			return redirect('editcourse', course_id=course.id)
-
-		if 'save' in request.POST:
+		elif 'save' in request.POST:
 			if request.POST['title'] and request.POST.getlist('topic'):
 				savecourse(request,course)
 				return redirect('editcourse', course_id=course.id)
 			else:
 				return render(request, 'topics/editcourse.html', {'teacher':teacher,'topics': topics , 'course': course, 'error': 'Title and Topic fields are required'})
-		if 'save_exit' in request.POST:
+		elif 'save_exit' in request.POST:
 			if request.POST['title'] and request.POST.getlist('topic'):
 				savecourse(request,course)
 				return redirect('teacher')
 			else:
 				return render(request, 'topics/editcourse.html', {'topics': topics , 'course': course, 'error': 'Title and Topic fields are required'})	
-		if 'publish' in request.POST:
+		elif 'publish' in request.POST:
 			if request.POST['title'] and request.POST.getlist('topic'):
 				savecourse(request,course)
 				if course.isPublishable == True:
@@ -642,7 +650,6 @@ def editquiz(request, quiz_id):
 
 def savequiz(request,quiz):
 
-	print(request.POST)
 	
 	orderquestion(request)
 
@@ -763,7 +770,6 @@ def orderchoice(request):
 		order_array = request.POST['choice-order']
 		order_array = order_array.split(',')
 
-		print(request.POST)
 
 		if 'choice-radio' in request.POST:
 			trueChoice = request.POST['choice-radio']
@@ -855,7 +861,6 @@ def viewcourse(request,course_id):
 				lsr.append(learner_section[0].section)
 				lsr_all.append(learner_section[0])
 
-	#coursefinishcheck(request,course_id)
 
 
 	return render(request, 'topics/viewcourse.html',{'learner':learner,'course': course, 'lsr': lsr,'lsr_all': lsr_all,'lsr_finished': lsr_finished})
@@ -901,12 +906,6 @@ def coursefinishcheck(request,course_id):
 		learner_course_record.completeRate = completeRate*100
 		learner_course_record.isFinished = False
 		learner_course_record.save()
-
-		print(lir_finished_list)
-		print(len(lir_finished_list))
-		print(len(lpitems))
-
-
 
 @login_required
 def viewglossary(request,course_id):
@@ -1034,7 +1033,6 @@ def viewquiz(request,quiz_id):
 
 
 	if request.method == 'POST':
-		print(request.POST)
 		questions = quiz.question_set.all()
 		number_of_questions = len(questions)
 		successrate = 0

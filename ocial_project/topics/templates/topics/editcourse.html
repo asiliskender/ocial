@@ -143,20 +143,20 @@
                         <option selected value="{{ topic.id }}">{{ topic }}</option>
                         {% else %}
                         <option value="{{ topic.id }}">{{ topic }}</option>
-                        {% endif %} {% endfor %}
+                        {% endif %} 
+                        {% endfor %}
                     </select>
                     <br />
 
-                    <form class="form-inline" action="">
                         <div class="input-group mb-3">
                             <input type="text" class="form-control" placeholder="New Topic" name="topictitle" aria-describedby="basic-addon2">
                             <div class="input-group-append">
-                                <button class="btn btn-danger" type="submit" name="newtopic"><i class="fas fa-plus"></i> Add</button>
+                                <button class="btn btn-danger"  type="submit" name="newtopic"><i class="fas fa-plus"></i> Add</button>
                             </div>
                         </div>
-                    </form>
 
-                    <br /> {% for label in course.label.all %}
+                    <br /> 
+                    {% for label in course.label.all %}
                     <button type="button" onclick="window.location.href='{% url 'deletelabel' course.id label.id %}';" class="badge badge-pill badge-dark" style="margin-bottom: 5px;"><i class="fa fa-close"></i> {{ label.name }}</button>
 
                     {% endfor %}
@@ -200,9 +200,6 @@
             sendSectionOrder()
         };
 
-        document.getElementById("save_exit").onclick = function() {
-            sendSectionOrder()
-        };
         document.getElementById("publish").onclick = function() {
             sendSectionOrder()
         };
@@ -214,6 +211,12 @@
             order.form.submit();
 
         }
+    </script>
+
+    <script type="text/javascript">
+        document.getElementById("save_exit").onclick = function() {
+            sendSectionOrder()
+        };
     </script>
 
 </div>

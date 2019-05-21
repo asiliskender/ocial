@@ -89,16 +89,15 @@
                     </select>
                     <br />
 
-                    <form class="form-inline" action="">
                         <div class="input-group mb-3">
                             <input type="text" class="form-control" placeholder="New Topic" name="topictitle" aria-describedby="basic-addon2">
                             <div class="input-group-append">
-                                <button class="btn btn-outline-danger" type="submit" name="newtopic">Add</button>
+                                <button class="btn btn-danger"  type="submit" name="newtopic"><i class="fas fa-plus"></i> Add</button>
                             </div>
                         </div>
-                    </form>
 
-                    <br /> {% for label in course.label.all %}
+                    <br /> 
+                    {% for label in course.label.all %}
                     <button type="submit" name="removelabel" class="badge badge-pill badge-dark" style="margin-bottom: 5px;">{{ label.name }}</button>
                     <input type="hidden" name="labelremove" value="{{ label.id }}"> {% endfor %}
 
