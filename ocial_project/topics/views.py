@@ -187,6 +187,20 @@ def newcourse(request):
 				topic = Topic()
 				topic.title = request.POST['topictitle']
 				topic.save()
+				if request.POST['title']:
+					course = Course()
+					course.title = request.POST['title']
+					course.description = request.POST['description']
+					course.wywl = request.POST['wywl']
+					course.pubdate = timezone.datetime.now()
+					course.teacher = request.user
+					course.topic = topic
+					
+					if request.FILES.get('image', False):
+						course.image = request.FILES['image']
+
+					course.save()
+					return redirect('editcourse', course_id=course.id)
 			return redirect('newcourse')
 		if 'save' in request.POST:
 			if request.POST['title'] and request.POST.getlist('topic'):
