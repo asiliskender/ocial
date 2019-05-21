@@ -938,6 +938,21 @@ def viewcourse(request,course_id):
 				lsr.append(learner_section[0].section)
 				lsr_all.append(learner_section[0])
 
+	coursefinishcheck(request,course_id)
+
+	sections = course.section_set.all()
+
+	for section in sections:
+
+		learningpath = createlearningpath(section.id)
+
+		for item in learningpath:
+			if isinstance(item, Lecture):
+				learner_lecture_record, created = Learner_Lecture_Record.objects.get_or_create(learner=learner,lecture=item)
+				learner_lecture_record.save()
+			elif isinstance(item, Quiz):
+				learner_quiz_record, created = Learner_Quiz_Record.objects.get_or_create(learner=learner,quiz=item)
+				learner_quiz_record.save()
 
 
 	return render(request, 'topics/viewcourse.html',{'learner':learner,'course': course, 'lsr': lsr,'lsr_all': lsr_all,'lsr_finished': lsr_finished})
