@@ -55,7 +55,7 @@
                     {% for glossary in course.glossary_set.all %}
 
                     <div class="card">
-                        {% if glossary.image_url %}<img class="card-img-top" src="{{glossary.image_url}}" alt="Card image cap">{% endif %}
+                        {% if glossary.image_url %}<img class="card-img-top" src="{{glossary.image_url}}" >{% endif %}
 
                         <div class="card-body">
                             <h5 class="card-title">{{glossary.name}}</h5>

@@ -46,13 +46,13 @@
             {%if learner_section_record.section in lsr_finished %}
 
             <div class="progress">
-             <div class="progress-bar bg-success" role="progressbar" style="width: {{learner_section_record.completeRate}}%;" aria-valuenow="{{learner_section_record.completeRate}}" aria-valuemin="0" aria-valuemax="100">{{learner_section_record.completeRate}}% Completed</div>
+             <div class="progress-bar progress-bar progress-bar-striped bg-success" role="progressbar" style="width: {{learner_section_record.completeRate}}%;" aria-valuenow="{{learner_section_record.completeRate}}" aria-valuemin="0" aria-valuemax="100">{{learner_section_record.completeRate}}% Completed</div>
             </div>
 
             {%else%}
 
             <div class="progress">
-             <div class="progress-bar bg-warning" role="progressbar" style="width: {{learner_section_record.completeRate}}%;" aria-valuenow="{{learner_section_record.completeRate}}" aria-valuemin="0" aria-valuemax="100">{{learner_section_record.completeRate}}%</div>
+             <div class="progress-bar progress-bar progress-bar-striped progress-bar-animated bg-warning" role="progressbar" style="width: {{learner_section_record.completeRate}}%;" aria-valuenow="{{learner_section_record.completeRate}}" aria-valuemin="0" aria-valuemax="100">{{learner_section_record.completeRate}}%</div>
             </div>
             {%endif%}
         </div>

@@ -23,13 +23,13 @@
                     {%if lcr in lcr_finished %}
 
                     <div class="progress">
-                     <div class="progress-bar bg-success" role="progressbar" style="width: {{lcr.completeRate}}%;" aria-valuenow="{{lcr.completeRate}}" aria-valuemin="0" aria-valuemax="100">{{lcr.completeRate}}% Completed</div>
+                     <div class="progress-bar progress-bar-striped bg-success" role="progressbar" style="width: {{lcr.completeRate}}%;" aria-valuenow="{{lcr.completeRate}}" aria-valuemin="0" aria-valuemax="100">{{lcr.completeRate}}% Completed</div>
                     </div>
 
                     {%else%}
 
                     <div class="progress">
-                     <div class="progress-bar bg-warning" role="progressbar" style="width: {{lcr.completeRate}}%;" aria-valuenow="{{lcr.completeRate}}" aria-valuemin="0" aria-valuemax="100">{{lcr.completeRate}}%</div>
+                     <div class="progress-bar progress-bar-striped progress-bar-animated bg-warning" role="progressbar" style="width: {{lcr.completeRate}}%;" aria-valuenow="{{lcr.completeRate}}" aria-valuemin="0" aria-valuemax="100">{{lcr.completeRate}}%</div>
                     </div>
                     {%endif%}
 

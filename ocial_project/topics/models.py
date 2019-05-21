@@ -24,6 +24,9 @@ class Course(models.Model):
 	published = models.BooleanField(default=False)
 	course_learner = models.ManyToManyField(Learner, blank=True,through='Learner_Course_Record')
 	isPublishable = models.BooleanField(default=False)
+	completeRate = models.DecimalField(default= 0,max_digits=5,decimal_places=1)
+	numberofLearners = models.IntegerField(default= 0)
+
 
 
 	def pub_date_exact(self):
@@ -49,7 +52,7 @@ class Learner_Course_Record(models.Model):
     learner = models.ForeignKey(Learner, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     isFinished = models.BooleanField(default=False)
-    completeRate = models.IntegerField(default= 0)
+    completeRate = models.DecimalField(default= 0, max_digits=5,decimal_places=1)
 
     def __str__(self):
         return self.learner.user.username + " - " +self.course.title
@@ -73,6 +76,8 @@ class Section(models.Model):
 	section_learner = models.ManyToManyField(Learner, blank=True,through='Learner_Section_Record')
 	isLinked = models.BooleanField(default=False)
 	isPublishable = models.BooleanField(default=False)
+	completeRate = models.DecimalField(default= 0, max_digits=5,decimal_places=1)
+
 
 
 	class Meta:
@@ -85,7 +90,7 @@ class Learner_Section_Record(models.Model):
     learner = models.ForeignKey(Learner, on_delete=models.CASCADE)
     section = models.ForeignKey(Section, on_delete=models.CASCADE)
     isFinished = models.BooleanField(default=False)
-    completeRate = models.IntegerField(default = 0)
+    completeRate = models.DecimalField(default= 0, max_digits=5,decimal_places=1)
 
     def __str__(self):
         return self.learner.user.username + " - " +self.section.name
@@ -96,6 +101,8 @@ class Lecture(models.Model):
 	section = models.ForeignKey('Section', on_delete=models.CASCADE)
 	order =  models.IntegerField(default=1)
 	lecture_learner = models.ManyToManyField(Learner, blank=True,through='Learner_Lecture_Record')
+	completeRate = models.DecimalField(default= 0, max_digits=5,decimal_places=1)
+
 
 
 	class Meta:
@@ -120,6 +127,8 @@ class Quiz(models.Model):
 	successrate =  models.IntegerField(default=0)
 	quiz_learner = models.ManyToManyField(Learner, blank=True,through='Learner_Quiz_Record')
 	isPublishable = models.BooleanField(default=False)
+	completeRate = models.DecimalField(default= 0, max_digits=5,decimal_places=1)
+
 
 
 	class Meta:

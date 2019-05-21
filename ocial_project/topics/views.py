@@ -99,8 +99,68 @@ def coursedetail(request, course_id):
 
 @login_required
 def classroom(request):
-	courses = Course.objects.filter(teacher=request.user)
+	courses = Course.objects.filter(teacher=request.user, published = True)
+
+	for course in courses:
+		course_complete = 0
+		numberof_learners = 0
+		lcrs = Learner_Course_Record.objects.filter(course=course)
+		if lcrs:
+			for lcr in lcrs:
+				course_complete += lcr.completeRate/len(lcrs)
+				numberof_learners += 1
+		course.completeRate = course_complete
+		course.numberofLearners = numberof_learners
+		course.save()
+
 	return render(request, 'topics/classroom.html',{'courses': courses })
+
+@login_required
+@course_teacher_is_user
+def coursestatistics(request, course_id):
+	course =  get_object_or_404(Course,pk=course_id) 
+	sections = Section.objects.filter(course = course)
+
+	for section in sections:
+		section_complete = 0
+		lsrs = Learner_Section_Record.objects.filter(section=section)
+		if lsrs:
+			for lsr in lsrs:
+				section_complete += lsr.completeRate/len(lsrs)
+		section.completeRate = section_complete
+		section.save()
+
+	return render(request, 'topics/coursestatistics.html', {'sections':sections})
+
+@login_required
+@section_teacher_is_user
+def sectionstatistics(request, section_id):
+	section =  get_object_or_404(Section,pk=section_id) 
+	learningpath = createlearningpath(section.id)
+
+	for item in learningpath:
+		item_complete = 0
+		if isinstance(item, Lecture):
+			llrs = Learner_Lecture_Record.objects.filter(lecture=item)
+			if llrs:
+				for llr in llrs:
+					if llr.isFinished == True:
+						item_complete += 1/len(llrs)*100
+			item.completeRate = item_complete
+			item.save()
+		elif isinstance(item, Quiz):
+			lqrs = Learner_Quiz_Record.objects.filter(quiz=item)
+			if lqrs:
+				for lqr in lqrs:
+					if lqr.isFinished == True:
+						item_complete += 1/len(lqrs)*100
+			item.completeRate = item_complete
+			item.save()
+
+	learningpath = createlearningpath(section.id)
+
+	return render(request, 'topics/sectionstatistics.html', {'learningpath':learningpath})
+
 
 @login_required
 def profile(request):
@@ -195,7 +255,7 @@ def newcourse(request):
 					course.pubdate = timezone.datetime.now()
 					course.teacher = request.user
 					course.topic = topic
-					
+
 					if request.FILES.get('image', False):
 						course.image = request.FILES['image']
 
@@ -628,6 +688,7 @@ def editquiz(request, quiz_id):
 		quiz.isPublishable = False
 
 	if request.method == 'POST':
+			savequiz(request,quiz)
 			if 'save_quiz' in request.POST:
 				if request.POST['quiztitle']:
 					savequiz(request,quiz)
@@ -714,6 +775,7 @@ def editquestion(request, question_id):
 		question.isPublishable = False
 
 	if request.method == 'POST':
+			savequestion(request,question)
 			if 'save_question' in request.POST:
 				if request.POST['questiontitle']:
 					savequestion(request,question)
@@ -802,6 +864,7 @@ def orderchoice(request):
 			i += 1
 
 @login_required
+@choice_teacher_is_user
 def deletechoice(request,choice_id):
 	choice = get_object_or_404(Choice,pk=choice_id)
 	question_id = choice.question.id
