@@ -870,9 +870,13 @@ def coursefinishcheck(request,course_id):
 
 	lsr_finished = list()
 	lsr = list()
+	lir_finished_list = list()
 
 	for section in sections:
 		sectionfinishcheck(request,section.id)
+		lir,lir_finished = pathitemstate(section.id,learner)
+		for item in lir_finished:
+			lir_finished_list.append(item)
 		learner_section = Learner_Section_Record.objects.filter(learner = learner, section = section)
 		if learner_section:
 			if learner_section[0].isFinished == True:
@@ -886,10 +890,21 @@ def coursefinishcheck(request,course_id):
 		learner_course_record.isFinished = True
 		learner_course_record.save()
 	else:
-		completeRate = len(lsr_finished)/len(course.section_set.all())
+		#completeRate = len(lsr_finished)/len(course.section_set.all())
+		lpitems = list()
+		sections = course.section_set.all()
+		for section in sections:
+			learningpath = createlearningpath(section.id)
+			for item in learningpath:
+				lpitems.append(item)
+		completeRate = len(lir_finished_list)/len(lpitems)
 		learner_course_record.completeRate = completeRate*100
 		learner_course_record.isFinished = False
 		learner_course_record.save()
+
+		print(lir_finished_list)
+		print(len(lir_finished_list))
+		print(len(lpitems))
 
 
 
