@@ -65,20 +65,18 @@
 
                 {%if givenanswers%}
 
-                {% if quiz == learningpath|last %}
+                    {% if quiz == learningpath|last %}
 
-                <button type="submit" style="float:right;margin-bottom: 30px;" name="finish_section" class="btn btn-danger">Finish Section</button>
+                    <button type="submit" style="float:right;margin-bottom: 30px;" name="finish_section" class="btn btn-danger" value="True">Finish Section</button>
+
+                    {%else%}
+
+                    <button type="submit" style="float:right;margin-bottom: 30px;" name="finish_quiz" class="btn btn-danger"value="True" >Next <i class="fa fa-chevron-right"></i></button>
+
+
+                    {%endif%}
 
                 {%else%}
-
-                <button type="submit" style="float:right;margin-bottom: 30px;" name="finish_quiz" class="btn btn-danger">Next <i class="fa fa-chevron-right"></i></button>
-
-                {%endif%}
-
-
-
-                {%else%}
-
 
                 <button type="submit" style="float:right;margin-bottom: 30px;" name="complete_quiz" class="btn btn-danger">Next <i class="fa fa-chevron-right"></i></button>
 
