@@ -11,7 +11,13 @@
 <div id="content-wrapper">
 
     <div class="container-fluid">
-        <div class="card-columns">
+
+        <div class="card mb-3" style="margin-top:10px;">
+            <div class="card-header">
+                <i class="fas fa-fw fa-tachometer-alt"></i> Dashboard
+            </div>
+
+        <div class="card-columns" style="margin: 20px;">
             {% for course in courses %}
 
             <div class="card">
@@ -44,6 +50,8 @@
             </div>
             {% endfor %}
 
+</div>
+</div>
         </div>
 
     </div>
