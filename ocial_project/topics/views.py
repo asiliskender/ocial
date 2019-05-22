@@ -289,7 +289,6 @@ def editcourse(request,course_id):
 	course.save()
 
 	if request.method == 'POST':
-		print(request.POST)
 		savecourse(request,course)
 		if 'addglossary' in request.POST:
 			return redirect('glossary', course_id=course.id)
@@ -926,6 +925,7 @@ def viewcourse(request,course_id):
 	lsr = list()
 	lsr_finished= list()
 	lsr_all = list()
+	lsr_not_started = list()
 
 	for section in course.section_set.all():
 		sectionfinishcheck(request,section.id)
@@ -933,6 +933,9 @@ def viewcourse(request,course_id):
 		if learner_section:
 			if learner_section[0].isFinished == True:
 				lsr_finished.append(learner_section[0].section)
+				lsr_all.append(learner_section[0])
+			elif learner_section[0].completeRate == 0:
+				lsr_not_started.append(learner_section[0].section)
 				lsr_all.append(learner_section[0])
 			else:
 				lsr.append(learner_section[0].section)
@@ -955,7 +958,7 @@ def viewcourse(request,course_id):
 				learner_quiz_record.save()
 
 
-	return render(request, 'topics/viewcourse.html',{'learner':learner,'course': course, 'lsr': lsr,'lsr_all': lsr_all,'lsr_finished': lsr_finished})
+	return render(request, 'topics/viewcourse.html',{'learner':learner,'course': course, 'lsr': lsr,'lsr_all': lsr_all,'lsr_finished': lsr_finished,'lsr_not_started': lsr_not_started})
 
 @login_required
 def coursefinishcheck(request,course_id):
@@ -1122,9 +1125,12 @@ def viewquiz(request,quiz_id):
 
 	givenanswers = list()
 	correctanswers = list()
+	choiceflag = False
 
 
 	if request.method == 'POST':
+		if 'finish_section' in request.POST or 'finish_quiz' in request.POST:
+			choiceflag = True
 		questions = quiz.question_set.all()
 		number_of_questions = len(questions)
 		successrate = 0
@@ -1135,12 +1141,17 @@ def viewquiz(request,quiz_id):
 					correctanswers.append(choice)
 			choice_question_id = "choice-radio-"+ str(question.id)
 			if choice_question_id in request.POST:
+				choiceflag = True
 				answer_id = request.POST[choice_question_id]
 				answer =  get_object_or_404(Choice,pk=answer_id)
 				givenanswers.append(answer)
 				if answer.isTrue == True:
 					successrate += (1/number_of_questions)*100
 					successrate = int(successrate)
+		if choiceflag == False:
+			error = "You have to answer at least one question."
+			return render(request, 'topics/viewquiz.html',{'learner':learner,'quiz': quiz, 'learningpath':learningpath, 'lir':lir, 'lir_finished':lir_finished, 'error': error})
+
 
 		if 'finish_section' in request.POST:
 			lir,lir_finished = pathitemstate(quiz.section.id,learner)

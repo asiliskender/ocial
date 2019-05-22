@@ -32,12 +32,12 @@
         <div class="card-body">
             <h5 class="card-title">{{learner_section_record.section.name}}</h5>
             <p class="card-text">{{learner_section_record.section.description}}</p>
-                {%if learner_section_record.section in lsr %}
-                <a href="{% url 'viewsection' learner_section_record.section.id %}" class="btn btn-danger">Resume Section</a>
+                {%if learner_section_record.section in lsr_not_started %}
+                <a href="{% url 'viewsection' learner_section_record.section.id %}" class="btn btn-danger">Start Section</a>
                 {%elif learner_section_record.section in lsr_finished %}
                 <a href="{% url 'viewsection' learner_section_record.section.id %}" class="btn btn-danger">View Section</a>
                 {%else%}
-                <a href="{% url 'viewsection' learner_section_record.section.id %}" class="btn btn-danger">Start Section</a>
+                <a href="{% url 'viewsection' learner_section_record.section.id %}" class="btn btn-danger">Resume Section</a>
                 {%endif%}
 
             <br />
