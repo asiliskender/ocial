@@ -26,7 +26,7 @@ class CourseTestCase(TestCase):
 	def setUp(self):
 
 		self.topic = Topic.objects.create(
-          title='Sport',
+          title='Sport'
         )
 
 		self.pubdate = timezone.now()
