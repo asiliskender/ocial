@@ -11,6 +11,10 @@ class Topic(models.Model):
 	def __str__(self):
 		return self.title
 
+	def get_title(self):
+		return self.title
+
+
 
 class Course(models.Model):
 	title = models.CharField(max_length=200)
@@ -41,6 +45,7 @@ class Course(models.Model):
 
 	def summary(self):
 		return self.description[:200]
+
 
 class Label(models.Model):
 	name = models.CharField(max_length=50, unique=True)
