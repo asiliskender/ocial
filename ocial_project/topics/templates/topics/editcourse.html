@@ -133,13 +133,16 @@
                     <button type="submit" name="addglossary" class="btn btn-danger btn-block"><i class="fas fa-plus"></i> Add Glossary</button>
                     <br />
 
-                    <img src="{{ course.image.url }}" style="width:100%; height: auto"> {% endif %}
+                    <img src="{{ course.image.url }}" style="width:100%; height: auto"> 
+                    {% endif %}
+                    Course Image
                     <input type="file" class="form-control-file" name="image">
                     <br />
                     <label for="exampleFormControlSelect1">Topic</label>
                     <select class="form-control" name="topic">
                         <option disabled selected>Select topic</option>
-                        {% for topic in topics.all %} {% if topic.id == course.topic.id %}
+                        {% for topic in topics.all %} 
+                        {% if topic.id == course.topic.id %}
                         <option selected value="{{ topic.id }}">{{ topic }}</option>
                         {% else %}
                         <option value="{{ topic.id }}">{{ topic }}</option>
