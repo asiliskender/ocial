@@ -42,13 +42,13 @@
             <ul class="list-group">
 
                 {% for resource in lecture.section.resource_set.all %}
-                <li class="list-group-item"><a target="_blank" href="{{resource.link.url}}">{{resource.name}}</a></li>
+                <li class="list-group-item"><a target="_blank" rel="noopener noreferrer" href="{{resource.link.url}}">{{resource.name}}</a></li>
                 {% endfor %}
 
             </ul>
             <br />
 
-            <a href="{% url 'viewglossary' lecture.section.course.id %}" target="_blank" class="btn btn-outline-danger btn-block ">Glossary</a>
+            <a href="{% url 'viewglossary' lecture.section.course.id %}" rel="noopener noreferrer" target="_blank" class="btn btn-outline-danger btn-block ">Glossary</a>
 
             <a href="{% url 'viewcourse' lecture.section.course.id %}" class="btn btn-danger btn-block ">Exit</a>
 

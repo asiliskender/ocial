@@ -41,7 +41,7 @@
 
                 <div class="list-group">
                     <p class="list-group-item clearfix" style="margin-bottom:5px;">
-                        {{glossary.label}} <small>(<a href="{{glossary.url}}" target="_blank">{{ glossary.title}}</a>)</small> {%if glossary.description %}<small class="card-text">: {{ glossary.description }}</small>{%endif%}
+                        {{glossary.label}} <small>(<a href="{{glossary.url}}" rel="noopener noreferrer" target="_blank">{{ glossary.title}}</a>)</small> {%if glossary.description %}<small class="card-text">: {{ glossary.description }}</small>{%endif%}
 
                         <span class="pull-right">
                             <a href="{% url 'newglossary' course.id glossary.id %}" class="btn btn-danger" ><i class="fas fa-plus"></i></a>
@@ -60,7 +60,7 @@
                         <div class="card-body">
                             <h5 class="card-title">{{glossary.name}}</h5>
                             <p class="card-text">{{glossary.description}}</p>
-                            <a href="{{glossary.url}}" target="_blank" class="btn  btn-danger"><i class="fab fa-wikipedia-w"></i></a>
+                            <a href="{{glossary.url}}" rel= "noopener noreferrer"  target="_blank" class="btn  btn-danger"><i class="fab fa-wikipedia-w"></i></a>
                             <a href="{% url 'deleteglossary' glossary.id %}" style="float: right;" class="btn btn-outline-danger"><i class="far fa-trash-alt"></i></a>
                         </div>
                     </div>
