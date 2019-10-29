@@ -2,10 +2,9 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib import auth
 from django.http import HttpResponseRedirect
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect, get_object_or_404
-from topics.models import *
-from .models import *
+from django.shortcuts import render, redirect
+import topics.models
+import accounts.models
 
 
 
